@@ -1,24 +1,88 @@
-class MyScene extends THREE.Scene {
-
+class MyScene extends Physijs.Scene {
     constructor (myCanvas) {
+
+      // El gestor de hebras
+      Physijs.scripts.worker = './physijs/physijs_worker.js'
+      // El motor de física de bajo nivel, en el cual se apoya Physijs
+      Physijs.scripts.ammo   = './ammo.js'
       super();
       
       // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
       this.renderer = this.createRenderer(myCanvas);
       
-      this.gui = this.createGUI ();
+      //gravedad
+      this.setGravity (new THREE.Vector3 (0, -1000, 0));
 
+      this.gui = this.createGUI ();
       this.createLights ();
-      
       this.createCamera ();
       
       
-      this.axis = new THREE.AxesHelper (7);
-      this.add (this.axis);
+      // this.axis = new THREE.AxesHelper (7);
+      // this.add (this.axis);
 
+      var material = new THREE.MeshPhongMaterial({color:0xff0000});
+      var materialFis = new Physijs.createMaterial(material,0,0);
+
+      var geometry = new THREE.BoxGeometry(4,4,4);
+
+      this.physicBox = new Physijs.BoxMesh(geometry,materialFis,25);
+      this.physicBox.position.y = 4;
+      this.physicBox.position.x = -15;
+
+      var fuerza = 10;
+      var offset = new THREE.Vector3(1,0,0);
+      this.effect = offset.normalize().multiplyScalar(fuerza);
+      
+      this.add (this.physicBox);
+
+      this.physicBox.applyCentralImpulse (this.effect);
+
+      this.createGround();
 
     }
 
+
+    update () {
+
+      requestAnimationFrame(() => this.update())
+      this.spotLight.intensity = this.guiControls.lightIntensity;
+      
+      this.physicBox.applyCentralImpulse (this.effect);
+      this.cameraControl.update();
+
+      
+      this.renderer.render (this, this.getCamera());
+      this.simulate();
+    }
+
+
+    createGround () {
+      // El suelo es un Mesh, necesita una geometría y un material.
+      
+      // La geometría es una caja con muy poca altura
+      var geometryGround = new THREE.BoxGeometry (100,0.2,100);
+      
+      // El material se hará con una textura de madera
+      var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
+      var materialGround = new THREE.MeshPhongMaterial ({map: texture});
+      var materialFis = new Physijs.createMaterial(materialGround,0.9,0.3);
+      
+      // Ya se puede construir el Mesh
+      var ground = new Physijs.BoxMesh (geometryGround, materialFis,0);
+      
+      // Todas las figuras se crean centradas en el origen.
+      // El suelo lo bajamos la mitad de su altura para que el origen del mundo se quede en su lado superior
+      ground.position.y = -0.1;
+      
+      // Que no se nos olvide añadirlo a la escena, que en este caso es  this
+      this.add (ground);
+    }
+
+
+    
+
+    
     createCamera () {
       // Para crear una cámara le indicamos
       //   El ángulo del campo de visión en grados sexagesimales
@@ -62,8 +126,6 @@ class MyScene extends THREE.Scene {
       // Se le añade un control para la intensidad de la luz
       folder.add (this.guiControls, 'lightIntensity', 0, 1, 0.1).name('Intensidad de la Luz : ');
       
-      // Y otro para mostrar u ocultar los ejes
-      folder.add (this.guiControls, 'axisOnOff').name ('Mostrar ejes : ');
       
       return gui;
     }
@@ -120,18 +182,6 @@ class MyScene extends THREE.Scene {
       this.renderer.setSize (window.innerWidth, window.innerHeight);
     }
   
-    update () {
-
-      requestAnimationFrame(() => this.update())
-      this.spotLight.intensity = this.guiControls.lightIntensity;
-      this.axis.visible = this.guiControls.axisOnOff;
-      
-
-      this.cameraControl.update();
-
-      
-      this.renderer.render (this, this.getCamera());
-    }
   }
   
   /// La función   main
