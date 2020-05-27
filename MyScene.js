@@ -1,5 +1,13 @@
+//import { ObjectLoader, SrcAlphaSaturateFactor } from "three";
+
 class MyScene extends Physijs.Scene {
     constructor (myCanvas) {
+      //Estados;
+      MyScene.SALTAR = 32;
+      MyScene.ABAJO = 40;
+      MyScene.ARRIBA = 38;
+      MyScene.IZQUIERDA = 37;
+      MyScene.DERECHA = 39;
 
       // El gestor de hebras
       Physijs.scripts.worker = './physijs/physijs_worker.js'
@@ -34,14 +42,31 @@ class MyScene extends Physijs.Scene {
       var offset = new THREE.Vector3(1,0,0);
       this.effect = offset.normalize().multiplyScalar(fuerza);
       
+      this.caja = new THREE.Mesh(geometry,material);
+      this.caja.position.x = 7;
+
+      this.octree = new THREE.Octree ({
+        undeferred : false,
+        depthMax: Infinity,
+        objectsThreshold: 4,
+        overlapPct: 0.2
+      });
+      this.createGround();
+      
       this.add (this.physicBox);
+      this.add(this.caja);
+      this.octree.add(this.physicBox,{useFaces: true});
+      this.octree.add(this.caja,{useFaces: true});
 
       this.physicBox.applyCentralImpulse (this.effect);
-
-      this.createGround();
-
     }
 
+    compruebaColision(){
+
+      var octreeObjects = this.octree.search(this.physicBox.position, 4 , true);
+     
+      console.log(octreeObjects);
+    }
 
     update () {
 
@@ -49,11 +74,12 @@ class MyScene extends Physijs.Scene {
       this.spotLight.intensity = this.guiControls.lightIntensity;
       
       this.physicBox.applyCentralImpulse (this.effect);
-      this.cameraControl.update();
+    //  this.cameraControl.update();
 
-      
+      this.compruebaColision();
       this.renderer.render (this, this.getCamera());
       this.simulate();
+      this.octree.update();
     }
 
 
@@ -61,7 +87,7 @@ class MyScene extends Physijs.Scene {
       // El suelo es un Mesh, necesita una geometría y un material.
       
       // La geometría es una caja con muy poca altura
-      var geometryGround = new THREE.BoxGeometry (100,0.2,100);
+      var geometryGround = new THREE.BoxGeometry (100,0.1,100);
       
       // El material se hará con una textura de madera
       var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
@@ -90,20 +116,20 @@ class MyScene extends Physijs.Scene {
       //   Los planos de recorte cercano y lejano
       this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
       // También se indica dónde se coloca
-      this.camera.position.set (0, 20, 40);
+      this.camera.position.set (0, 30, 110);
       // Y hacia dónde mira
       var look = new THREE.Vector3 (0,0,0);
       this.camera.lookAt(look);
       this.add (this.camera);
       
       // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
-      this.cameraControl = new THREE.TrackballControls (this.camera, this.renderer.domElement);
+    // this.cameraControl = new THREE.TrackballControls (this.camera, this.renderer.domElement);
       // Se configuran las velocidades de los movimientos
-      this.cameraControl.rotateSpeed = 5;
-      this.cameraControl.zoomSpeed = -2;
-      this.cameraControl.panSpeed = 0.5;
+      //this.cameraControl.rotateSpeed = 5;
+     //this.cameraControl.zoomSpeed = -2;
+     // this.cameraControl.panSpeed = 0.5;
       // Debe orbitar con respecto al punto de mira de la cámara
-      this.cameraControl.target = look;
+     // this.cameraControl.target = look;
     }
     
     
@@ -164,6 +190,29 @@ class MyScene extends Physijs.Scene {
       // Si hubiera varias cámaras, este método decidiría qué cámara devuelve cada vez que es consultado
       return this.camera;
     }
+    saltar(event){
+      var tecla = event.which || event.KeyCode;
+    
+      switch(tecla){
+        case MyScene.SALTAR:
+          console.log("Espacio");
+          this.physicBox.position.y += 10;
+          break;
+        case MyScene.ABAJO:
+          console.log("Abajo");
+          break;
+        case MyScene.ARRIBA:
+          console.log("Arriba");
+          break;
+        case MyScene.IZQUIERDA:
+          console.log("IZQUIERDA");
+          break;
+        case MyScene.DERECHA:
+          console.log("DERECHA");
+          break;
+      }
+
+    }
     
     setCameraAspect (ratio) {
       // Cada vez que el usuario modifica el tamaño de la ventana desde el gestor de ventanas de
@@ -183,7 +232,7 @@ class MyScene extends Physijs.Scene {
     }
   
   }
-  
+ 
   /// La función   main
   $(function () {
     
@@ -192,7 +241,7 @@ class MyScene extends Physijs.Scene {
 
     // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
     window.addEventListener ("resize", () => scene.onWindowResize());
-
+    window.addEventListener("keydown", (event) => scene.saltar(event));
     // Que no se nos olvide, la primera visualización.
     scene.update();
   });
