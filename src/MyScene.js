@@ -1,5 +1,7 @@
 //import { ObjectLoader, SrcAlphaSaturateFactor } from "three";
 
+
+
 class MyScene extends Physijs.Scene {
     constructor(myCanvas) {
 
@@ -63,8 +65,10 @@ class MyScene extends Physijs.Scene {
 
         this.createGround();
 
+        this.physicBox.radio = 4;
+        this.physicCaja.radio = 4;
 
-        this.fondo = new Fondo();
+        this.fondo = this.createfondo();
         this.add(this.fondo);
 
         this.salida = new Salida();
@@ -73,6 +77,14 @@ class MyScene extends Physijs.Scene {
         this.add(this.physicBox);
         this.add(this.physicCaja);
 
+        this.aro = new Aro();
+        this.aro.position.y = 2;
+        this.aro.position.x = 40;
+        this.add(this.aro);
+
+        this.pinchos = new Pinchos(10);
+        this.add(this.pinchos);
+        
         this.createOctree();
 
 
@@ -86,11 +98,22 @@ class MyScene extends Physijs.Scene {
     compruebaColision() {
 
         this.octreeObjects = this.octree.search(this.physicBox.position, 0.5, true);
+        var cuadradoSumaradios ;
+        var cuadradoDistanciaEuclidea;
 
-        if (this.octreeObjects.length > 1) {
-            this.octreeObjects[1].object.material.color.setHex(0x3eff00);
-            //console.log(this.octreeObjects[1].object.material.color);
+        for(var i = 0; i < this.octreeObjects.length ; i++){
+            cuadradoSumaradios = this.physicBox.radio + this.octreeObjects[i].object.radio;
+            cuadradoSumaradios *= cuadradoSumaradios;
+           console.log( this.octreeObjects[i]);
+             cuadradoDistanciaEuclidea = this.physicBox.position.distanceToSquared (this.octreeObjects[i].object.position);
+             if(cuadradoDistanciaEuclidea <cuadradoSumaradios){
+                 console.log("Colision");
+             }
         }
+        //if (this.octreeObjects.length > 1) {
+            //this.octreeObjects[1].object.material.color.setHex(0x3eff00);
+            //console.log(this.octreeObjects[1].object.material.color);
+     //   }
 
 
     }
@@ -101,6 +124,7 @@ class MyScene extends Physijs.Scene {
         this.spotLight.intensity = this.guiControls.lightIntensity;
 
         this.physicBox.applyCentralImpulse(this.effect);
+        this.aro.update();
         //this.cameraControl.update();
         //this.physicBox.setLinearVelocity(this.velocidad);
         this.renderer.render(this, this.getCamera());
@@ -129,6 +153,20 @@ class MyScene extends Physijs.Scene {
     }
 
 
+    createfondo(){
+       
+        var geometryGround = new THREE.BoxGeometry(400,0.1,100);
+        var texture = new THREE.TextureLoader().load('../imgs/ladrillo-difuso.png');
+   
+        var materialGround = new THREE.MeshPhongMaterial ({map: texture});
+        var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
+        var fondo = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+
+        fondo.rotation.x = 1.5708;
+        fondo.position.z = -23;
+        fondo.position.y = 24;
+       return fondo;
+    }
 
 
 
@@ -140,7 +178,7 @@ class MyScene extends Physijs.Scene {
         //   Los planos de recorte cercano y lejano
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         // También se indica dónde se coloca
-        this.camera.position.set(0, 30, 120);
+        this.camera.position.set(-10, 70, 120);
         // Y hacia dónde mira
         var look = new THREE.Vector3(0, 0, 0);
         this.camera.lookAt(look);
