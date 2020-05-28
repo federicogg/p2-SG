@@ -30,20 +30,26 @@ class MyScene extends Physijs.Scene {
       // this.add (this.axis);
 
       var material = new THREE.MeshPhongMaterial({color:0xff0000});
-      var materialFis = new Physijs.createMaterial(material,0,0);
+      var materialFis = new Physijs.createMaterial(material,0.3,0.2);
 
       var geometry = new THREE.BoxGeometry(4,4,4);
 
       this.physicBox = new Physijs.BoxMesh(geometry,materialFis,25);
+      this.physicCaja = new Physijs.BoxMesh(geometry,material,0);
+      this.physicCaja.position.x = 7;
       this.physicBox.position.y = 4;
       this.physicBox.position.x = -15;
 
       var fuerza = 10;
       var offset = new THREE.Vector3(1,0,0);
       this.effect = offset.normalize().multiplyScalar(fuerza);
+      this.physicBox.applyCentralImpulse (this.effect);
+
+     // this.caja = new THREE.Mesh(geometry,material);
+      //this.caja.position.x = 7;
       
-      this.caja = new THREE.Mesh(geometry,material);
-      this.caja.position.x = 7;
+      this.velocidad = new THREE.Vector3(10,0,0);
+      this.physicBox.setLinearVelocity(this.velocidad);
 
       this.octree = new THREE.Octree ({
         undeferred : false,
@@ -53,19 +59,25 @@ class MyScene extends Physijs.Scene {
       });
       this.createGround();
       
+
+      this.fondo = new Fondo();
+      this.add(this.fondo);
+
+      this.salida = new Salida();
+      this.add(this.salida);
+
       this.add (this.physicBox);
-      this.add(this.caja);
+      this.add(this.physicCaja);
       this.octree.add(this.physicBox,{useFaces: true});
       this.octree.add(this.caja,{useFaces: true});
 
-      this.physicBox.applyCentralImpulse (this.effect);
     }
 
     compruebaColision(){
 
       var octreeObjects = this.octree.search(this.physicBox.position, 4 , true);
      
-      console.log(octreeObjects);
+     // console.log(octreeObjects);
     }
 
     update () {
@@ -73,13 +85,13 @@ class MyScene extends Physijs.Scene {
       requestAnimationFrame(() => this.update())
       this.spotLight.intensity = this.guiControls.lightIntensity;
       
-      this.physicBox.applyCentralImpulse (this.effect);
+    this.physicBox.applyCentralImpulse (this.effect);
     //  this.cameraControl.update();
-
+     //this.physicBox.setLinearVelocity(this.velocidad);
       this.compruebaColision();
       this.renderer.render (this, this.getCamera());
       this.simulate();
-      this.octree.update();
+     // this.octree.update();
     }
 
 
@@ -87,19 +99,19 @@ class MyScene extends Physijs.Scene {
       // El suelo es un Mesh, necesita una geometría y un material.
       
       // La geometría es una caja con muy poca altura
-      var geometryGround = new THREE.BoxGeometry (100,0.1,100);
+      var geometryGround = new THREE.BoxGeometry (200,50,100);
       
       // El material se hará con una textura de madera
       var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
       var materialGround = new THREE.MeshPhongMaterial ({map: texture});
-      var materialFis = new Physijs.createMaterial(materialGround,0.9,0.3);
+      var materialFis = new Physijs.createMaterial(materialGround,0,0.1);
       
       // Ya se puede construir el Mesh
       var ground = new Physijs.BoxMesh (geometryGround, materialFis,0);
-      
+      ground.position.y = -25;
       // Todas las figuras se crean centradas en el origen.
       // El suelo lo bajamos la mitad de su altura para que el origen del mundo se quede en su lado superior
-      ground.position.y = -0.1;
+      
       
       // Que no se nos olvide añadirlo a la escena, que en este caso es  this
       this.add (ground);
@@ -116,7 +128,7 @@ class MyScene extends Physijs.Scene {
       //   Los planos de recorte cercano y lejano
       this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
       // También se indica dónde se coloca
-      this.camera.position.set (0, 30, 110);
+      this.camera.position.set (0, 30, 120);
       // Y hacia dónde mira
       var look = new THREE.Vector3 (0,0,0);
       this.camera.lookAt(look);
@@ -190,26 +202,39 @@ class MyScene extends Physijs.Scene {
       // Si hubiera varias cámaras, este método decidiría qué cámara devuelve cada vez que es consultado
       return this.camera;
     }
-    saltar(event){
+    eventosTeclado(event){
       var tecla = event.which || event.KeyCode;
     
       switch(tecla){
-        case MyScene.SALTAR:
-          console.log("Espacio");
-          this.physicBox.position.y += 10;
-          break;
         case MyScene.ABAJO:
-          console.log("Abajo");
+          this.physicBox.position.z += 1;
+          this.physicBox.__dirtyPosition = true;
           break;
         case MyScene.ARRIBA:
-          console.log("Arriba");
+          this.physicBox.position.z -= 1;
+          this.physicBox.__dirtyPosition = true;
           break;
         case MyScene.IZQUIERDA:
-          console.log("IZQUIERDA");
+          var fuerza = 70;
+          var offset = new THREE.Vector3(1,0,0);
+          var effect = offset.normalize().multiplyScalar(fuerza);
+          this.physicBox.applyCentralImpulse(effect.negate());
           break;
         case MyScene.DERECHA:
-          console.log("DERECHA");
+          var fuerza = 10;
+          var offset = new THREE.Vector3(1,0,0);
+          var effect = offset.normalize().multiplyScalar(10);
+          this.physicBox.applyCentralImpulse(effect);
           break;
+      }
+
+    }
+
+    saltar(event){
+      var tecla = event.which || event.KeyCode;
+      if(tecla == MyScene.SALTAR){
+        this.physicBox.position.y += 10;
+        this.physicBox.__dirtyPosition = true;
       }
 
     }
@@ -241,7 +266,8 @@ class MyScene extends Physijs.Scene {
 
     // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
     window.addEventListener ("resize", () => scene.onWindowResize());
-    window.addEventListener("keydown", (event) => scene.saltar(event));
+    window.addEventListener("keydown", (event) => scene.eventosTeclado(event));
+    window.addEventListener("keypress", (event) => scene.saltar(event));
     // Que no se nos olvide, la primera visualización.
     scene.update();
   });
