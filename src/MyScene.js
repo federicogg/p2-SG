@@ -31,13 +31,14 @@ class MyScene extends Physijs.Scene {
         // this.axis = new THREE.AxesHelper (7);
         // this.add (this.axis);
 
-        var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-        var materialFis = new Physijs.createMaterial(material, 0.3, 0.2);
+        var materialPlayer = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        var materialObstacle = new THREE.MeshPhongMaterial({ color: 0x000000 });
+        var materialFis = new Physijs.createMaterial(materialPlayer, 0.3, 0.2);
 
         var geometry = new THREE.BoxGeometry(4, 4, 4);
 
         this.physicBox = new Physijs.BoxMesh(geometry, materialFis, 25);
-        this.physicCaja = new Physijs.BoxMesh(geometry, material, 0);
+        this.physicCaja = new Physijs.BoxMesh(geometry, materialObstacle, 0);
         this.physicCaja.position.x = 7;
         this.physicBox.position.y = 4;
         this.physicBox.position.x = -15;
@@ -84,12 +85,11 @@ class MyScene extends Physijs.Scene {
 
     compruebaColision() {
 
-        this.octreeObjects = this.octree.search(this.physicBox.position, 2, true);
+        this.octreeObjects = this.octree.search(this.physicBox.position, 0.5, true);
 
         if (this.octreeObjects.length > 1) {
-            this.octreeObjects[1].object.material.color.setHex(0xffffff);
-            console.log(this.octreeObjects[1].object.material.color);
-            //this.octreeObjects[1].object.color;
+            this.octreeObjects[1].object.material.color.setHex(0x3eff00);
+            //console.log(this.octreeObjects[1].object.material.color);
         }
 
 
