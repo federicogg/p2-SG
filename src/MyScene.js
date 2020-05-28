@@ -84,7 +84,7 @@ class MyScene extends Physijs.Scene {
 
         this.pinchos = new Pinchos(10);
         this.add(this.pinchos);
-        
+
         this.createOctree();
 
 
@@ -98,22 +98,23 @@ class MyScene extends Physijs.Scene {
     compruebaColision() {
 
         this.octreeObjects = this.octree.search(this.physicBox.position, 0.5, true);
-        var cuadradoSumaradios ;
+        var cuadradoSumaradios;
         var cuadradoDistanciaEuclidea;
 
-        for(var i = 0; i < this.octreeObjects.length ; i++){
+        for (var i = 0; i < this.octreeObjects.length; i++) {
             cuadradoSumaradios = this.physicBox.radio + this.octreeObjects[i].object.radio;
             cuadradoSumaradios *= cuadradoSumaradios;
-           console.log( this.octreeObjects[i]);
-             cuadradoDistanciaEuclidea = this.physicBox.position.distanceToSquared (this.octreeObjects[i].object.position);
-             if(cuadradoDistanciaEuclidea <cuadradoSumaradios){
-                 console.log("Colision");
-             }
+            console.log(this.octreeObjects[i]);
+
+            cuadradoDistanciaEuclidea = this.physicBox.position.distanceToSquared(this.octreeObjects[i].object.position);
+            if (cuadradoDistanciaEuclidea < cuadradoSumaradios) {
+                console.log("Colision");
+            }
         }
         //if (this.octreeObjects.length > 1) {
-            //this.octreeObjects[1].object.material.color.setHex(0x3eff00);
-            //console.log(this.octreeObjects[1].object.material.color);
-     //   }
+        //this.octreeObjects[1].object.material.color.setHex(0x3eff00);
+        //console.log(this.octreeObjects[1].object.material.color);
+        //   }
 
 
     }
@@ -153,19 +154,19 @@ class MyScene extends Physijs.Scene {
     }
 
 
-    createfondo(){
-       
-        var geometryGround = new THREE.BoxGeometry(400,0.1,100);
+    createfondo() {
+
+        var geometryGround = new THREE.BoxGeometry(400, 0.1, 100);
         var texture = new THREE.TextureLoader().load('../imgs/ladrillo-difuso.png');
-   
-        var materialGround = new THREE.MeshPhongMaterial ({map: texture});
+
+        var materialGround = new THREE.MeshPhongMaterial({ map: texture });
         var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
         var fondo = new Physijs.BoxMesh(geometryGround, materialFis, 0);
 
         fondo.rotation.x = 1.5708;
         fondo.position.z = -23;
         fondo.position.y = 24;
-       return fondo;
+        return fondo;
     }
 
 
