@@ -56,12 +56,7 @@ class MyScene extends Physijs.Scene {
         this.velocidad = new THREE.Vector3(10, 0, 0);
         this.physicBox.setLinearVelocity(this.velocidad);
 
-        this.octree = new THREE.Octree({
-            undeferred: false,
-            depthMax: Infinity,
-            objectsThreshold: 4,
-            overlapPct: 0.2
-        });
+
 
         this.createGround();
 
@@ -75,7 +70,7 @@ class MyScene extends Physijs.Scene {
         this.add(this.salida);
 
         this.add(this.physicBox);
-        this.add(this.physicCaja);
+        //this.add(this.physicCaja);
 
         this.aro = new Aro();
         this.aro.position.y = 2;
@@ -83,34 +78,86 @@ class MyScene extends Physijs.Scene {
         this.add(this.aro);
 
         this.pinchos = new Pinchos(10);
-        this.add(this.pinchos);
+        //this.add(this.pinchos);
 
-        this.createOctree();
+        this.createTransparentBox();
+        //this.createOctree();
+        this.createColliders();
 
 
     }
 
+    createTransparentBox() {
+        var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        var geometry = new THREE.BoxGeometry(5, 10, 15);
+        //var materialFis = new Physijs.createMaterial(material, 0.3, 0.2);
+        //this.transparentBox = new Physijs.BoxMesh(geometry, materialFis, 0);
+
+        this.transparentBox = new THREE.Mesh(geometry, material);
+        this.transparentBox.position.copy(this.aro.position);
+        this.add(this.transparentBox);
+    }
+
+    createColliders() {
+        this.collidersList = [];
+        this.collidersList.push(this.transparentBox);
+    }
+
     createOctree() {
+
+        this.octree = new THREE.Octree({
+            undeferred: false,
+            depthMax: Infinity,
+            objectsThreshold: 4,
+            overlapPct: 0.2
+        });
+
+        this.octree.add(this.transparentBox, { useFaces: true });
         this.octree.add(this.physicBox, { useFaces: true });
-        this.octree.add(this.physicCaja, { useFaces: true });
+        //this.octree.add(this.physicCaja, { useFaces: true });
     }
 
     compruebaColision() {
 
-        this.octreeObjects = this.octree.search(this.physicBox.position, 0.5, true);
-        var cuadradoSumaradios;
-        var cuadradoDistanciaEuclidea;
+        var originPoint = this.physicBox.position.clone();
 
-        for (var i = 0; i < this.octreeObjects.length; i++) {
-            cuadradoSumaradios = this.physicBox.radio + this.octreeObjects[i].object.radio;
-            cuadradoSumaradios *= cuadradoSumaradios;
-            console.log(this.octreeObjects[i]);
+        for (var vertex = 0; vertex < this.physicBox.geometry.vertices.length; vertex++) {
+            var localVertex = this.physicBox.geometry.vertices[vertex].clone();
+            var globalVertex = localVertex.applyMatrix4(this.physicBox.matrix);
+            var directionVector = globalVertex.sub(this.physicBox.position);
 
-            cuadradoDistanciaEuclidea = this.physicBox.position.distanceToSquared(this.octreeObjects[i].object.position);
-            if (cuadradoDistanciaEuclidea < cuadradoSumaradios) {
-                console.log("Colision");
+            var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+            var collisionResults = ray.intersectObjects(this.collidersList);
+            if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
+                console.log('Colision');
             }
         }
+
+        //this.octreeObjects = this.octree.search(this.physicBox.position, 0.5, true);
+        // var cuadradoSumaradios;
+        // var cuadradoDistanciaEuclidea;
+
+
+        //console.log(this.octreeObjects);
+        //if (this.octreeObjects.length > 0) {
+
+        //console.log(this.physicBox.radio);
+        //console.log(this.octreeObjects[0].object.radio);
+        //this.octreeObjects[0].object.material.color.setHex(0x3eff00);
+        //}
+
+
+
+        // for (var i = 0; i < this.octreeObjects.length; i++) {
+        //     cuadradoSumaradios = this.physicBox.radio + this.octreeObjects[i].object.radio;
+        //     cuadradoSumaradios *= cuadradoSumaradios;
+        //     //console.log(this.octreeObjects[i]);
+
+        //     cuadradoDistanciaEuclidea = this.physicBox.position.distanceToSquared(this.octreeObjects[i].object.position);
+        //     if (cuadradoDistanciaEuclidea < cuadradoSumaradios) {
+        //         console.log("Colision");
+        //     }
+        // }
         //if (this.octreeObjects.length > 1) {
         //this.octreeObjects[1].object.material.color.setHex(0x3eff00);
         //console.log(this.octreeObjects[1].object.material.color);
@@ -130,7 +177,7 @@ class MyScene extends Physijs.Scene {
         //this.physicBox.setLinearVelocity(this.velocidad);
         this.renderer.render(this, this.getCamera());
         this.compruebaColision();
-        this.octree.update();
+        //this.octree.update();
         this.simulate();
     }
 
