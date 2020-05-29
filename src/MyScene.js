@@ -59,12 +59,12 @@ class MyScene extends Physijs.Scene {
 
 
 
-        this.createGround();
+        this.createGround(0);
 
         this.physicBox.radio = 4;
         this.physicCaja.radio = 4;
 
-        this.createfondo();
+        this.createfondo(0);
        // this.add(this.fondo);
 
         this.salida = new Salida();
@@ -78,11 +78,12 @@ class MyScene extends Physijs.Scene {
         this.collidersGemas = [];
 
         this.helices = [];
+        this.pinchos = []; 
         //this.createOctree();
         //this.createColliders();
 
         this.createObstaculos();   
-        this.createEscalera(4,0);
+        this.createEscalera(4,1);
 
     }
 
@@ -98,7 +99,7 @@ class MyScene extends Physijs.Scene {
         for(var i = 0 ; i < num ; i++){
             var physicBox = new Physijs.BoxMesh(geometry, materialFis, 0);
             physicBox.position.y += (i+0.2) * 10;
-            physicBox.position.x += i * 20;
+            physicBox.position.x += (i * 20)+ 70*index;
             this.add(physicBox);
         }
 
@@ -186,11 +187,12 @@ class MyScene extends Physijs.Scene {
             this.helices[i].update();
         }
         
-        //this.cameraControl.update();
-        //this.physicBox.setLinearVelocity(this.velocidad);
+      
+        //this.camera.position.x += 0.1;
+      
         this.renderer.render(this, this.getCamera());
         this.compruebaColision();
-        //this.octree.update();
+
         this.simulate();
     }
 
@@ -212,11 +214,45 @@ class MyScene extends Physijs.Scene {
         
     }
 
+    posicionarPlataformas(){
+          // La geometría es una caja con muy poca altura
+          var geometryGround = new THREE.BoxGeometry(40, 2, 50);
+
+          // El material se hará con una textura de madera
+          var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
+          var materialGround = new THREE.MeshPhongMaterial({ map: texture });
+          var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
+  
+          // Ya se puede construir el Mesh
+          var p1 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+          p1.position.set(150,32,0);
+          var pincho1 = new Pinchos(6);
+          pincho1.rotation.y = 1.57;
+          pincho1.position.set(150,40,-10); 
+          this.pinchos.push(pincho1);
+          this.add(p1);
+          this.add(pincho1);
+
+          pincho1 = new Pinchos(6);
+          pincho1.rotation.y = 1.57;
+          pincho1.position.set(150,42,20); 
+          this.pinchos.push(pincho1);
+          this.add(pincho1);
+
+          var p2 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+          p2.scale.x = 2;
+          p2.position.set(220,32,0);
+          this.add(p2);
+          
+    }
+
     createObstaculos(){
         this.posicionarHelices();
+        this.posicionarPlataformas();
+        this.createGround(350);
         
     }
-    createGround() {
+    createGround(offset) {
         // El suelo es un Mesh, necesita una geometría y un material.
 
         // La geometría es una caja con muy poca altura
@@ -230,12 +266,13 @@ class MyScene extends Physijs.Scene {
         // Ya se puede construir el Mesh
         var ground = new Physijs.BoxMesh(geometryGround, materialFis, 0);
         ground.position.y = -25;
+        ground.position.x = offset;
 
         this.add(ground);
     }
 
 
-    createfondo() {
+    createfondo(offset) {
 
         var geometryGround = new THREE.BoxGeometry(400, 0.1, 100);
         var texture = new THREE.TextureLoader().load('../imgs/ladrillo-difuso.png');
@@ -247,6 +284,7 @@ class MyScene extends Physijs.Scene {
         fondo.rotation.x = 1.5708;
         fondo.position.z = -23;
         fondo.position.y = 24;
+        fondo.position.x = offset;
 
         fondo.addEventListener ('collision',
         function (o,v,r,n) {
@@ -271,9 +309,9 @@ class MyScene extends Physijs.Scene {
         //   Los planos de recorte cercano y lejano
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         // También se indica dónde se coloca
-        this.camera.position.set(-30, 70, 120);
+        this.camera.position.set( 135, 70, 120);
         // Y hacia dónde mira
-        var look = new THREE.Vector3(0, 0, 0);
+        var look = new THREE.Vector3(135, 0, 0);
         this.camera.lookAt(look);
         this.add(this.camera);
 
@@ -417,7 +455,7 @@ $(function() {
     // Se añaden los listener de la aplicación. En este caso, el que va a comprobar cuándo se modifica el tamaño de la ventana de la aplicación.
     window.addEventListener("resize", () => scene.onWindowResize());
     window.addEventListener("keydown", (event) => scene.eventosTeclado(event));
-    window.addEventListener("keypress", (event) => scene.saltar(event));
+    window.addEventListener("keyup", (event) => scene.saltar(event));
     // Que no se nos olvide, la primera visualización.
 
     scene.update();
