@@ -32,7 +32,7 @@ class MyScene extends Physijs.Scene {
 
         this.createGround(0);
 
-        this.createfondo(200);
+        //this.createfondo(200);
 
         this.salida = new Salida();
         this.add(this.salida);
@@ -51,6 +51,7 @@ class MyScene extends Physijs.Scene {
 
         this.createObstaculos();
         this.createEscalera(4, 1);
+        this.createSkyBox();
 
     }
 
@@ -241,6 +242,29 @@ class MyScene extends Physijs.Scene {
         ground.position.x = offset;
 
         this.add(ground);
+    }
+
+    createSkyBox() {
+        var geometry = new THREE.BoxGeometry(1500, 1500, 1500);
+        var texture1 = new THREE.TextureLoader().load('../imgs/skybox/1.png');
+        var texture2 = new THREE.TextureLoader().load('../imgs/skybox/2.png');
+        var texture3 = new THREE.TextureLoader().load('../imgs/skybox/3.png');
+        var texture4 = new THREE.TextureLoader().load('../imgs/skybox/4.png');
+        var texture5 = new THREE.TextureLoader().load('../imgs/skybox/5.png');
+        var texture6 = new THREE.TextureLoader().load('../imgs/skybox/6.png');
+        var materials = [];
+        materials.push(new THREE.MeshBasicMaterial({ map: texture1, side: THREE.BackSide }));
+        materials.push(new THREE.MeshBasicMaterial({ map: texture2, side: THREE.BackSide }));
+        materials.push(new THREE.MeshBasicMaterial({ map: texture3, side: THREE.BackSide }));
+        materials.push(new THREE.MeshBasicMaterial({ map: texture4, side: THREE.BackSide }));
+        materials.push(new THREE.MeshBasicMaterial({ map: texture5, side: THREE.BackSide }));
+        materials.push(new THREE.MeshBasicMaterial({ map: texture6, side: THREE.BackSide }));
+
+        var skyMaterial = new THREE.MeshFaceMaterial(materials);
+
+        var skyBox = new THREE.Mesh(geometry, skyMaterial);
+        skyBox.position.x = 500;
+        this.add(skyBox);
     }
 
 
