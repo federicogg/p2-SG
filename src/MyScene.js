@@ -23,46 +23,20 @@ class MyScene extends Physijs.Scene {
         this.renderer = this.createRenderer(myCanvas);
 
         //gravedad
-        this.setGravity(new THREE.Vector3(0, -1000, 0));
+        this.setGravity(new THREE.Vector3(0, -100, 0));
 
         this.gui = this.createGUI();
         this.createLights();
-        this.createCamera();
 
 
         // this.axis = new THREE.AxesHelper (7);
         // this.add (this.axis);
 
-        var materialPlayer = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-        var materialObstacle = new THREE.MeshPhongMaterial({ color: 0x000000 });
-        var materialFis = new Physijs.createMaterial(materialPlayer, 0.3, 0.2);
-
-        var geometry = new THREE.BoxGeometry(4, 4, 4);
-
-        this.physicBox = new Physijs.BoxMesh(geometry, materialFis, 25);
-        this.physicCaja = new Physijs.BoxMesh(geometry, materialObstacle, 0);
-        this.physicCaja.position.x = 7;
-        this.physicBox.position.y = 1;
-        this.physicBox.position.x = -70;
-
-        var fuerza = 10;
-        var offset = new THREE.Vector3(1, 1, 0);
-        this.effect = offset.normalize().multiplyScalar(fuerza);
-        this.physicBox.applyCentralImpulse(this.effect);
-        this.physicBox.setLinearVelocity(new THREE.Vector3(10, 0, 0));
-
-        //this.caja = new THREE.Mesh(geometry,material);
-        //this.caja.position.x = 7;
-
-        this.velocidad = new THREE.Vector3(1, 0, 0);
-        this.physicBox.setLinearVelocity(this.velocidad);
-
+        this.createPlayer();
 
 
         this.createGround(0);
 
-        this.physicBox.radio = 4;
-        this.physicCaja.radio = 4;
 
         this.createfondo(0);
         // this.add(this.fondo);
@@ -70,9 +44,9 @@ class MyScene extends Physijs.Scene {
         this.salida = new Salida();
         this.add(this.salida);
 
-        this.add(this.physicBox);
-        //this.add(this.physicCaja);
 
+
+        this.createCamera();
         this.collidersHelices = [];
         this.collidersAros = [];
         this.collidersGemas = [];
@@ -87,11 +61,32 @@ class MyScene extends Physijs.Scene {
 
     }
 
+    createPlayer() {
+
+        var materialPlayer = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        var materialFis = new Physijs.createMaterial(materialPlayer, 0, 0);
+
+        var geometry = new THREE.BoxGeometry(4, 4, 4);
+
+        this.physicBox = new Physijs.BoxMesh(geometry, materialFis, 25);
+        this.physicBox.position.y = 1;
+        this.physicBox.position.x = -70;
+
+        var fuerza = 10;
+        var offset = new THREE.Vector3(1, 0, 0);
+        this.effect = offset.normalize().multiplyScalar(fuerza);
+
+
+        this.physicBox.radio = 4;
+        this.add(this.physicBox);
+
+    }
+
 
     createEscalera(num, index) {
         var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
-        var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
+        var materialFis = new Physijs.createMaterial(materialGround, 0, 0);
 
         var geometry = new THREE.BoxGeometry(20, 2, 50);
 
@@ -158,7 +153,7 @@ class MyScene extends Physijs.Scene {
         }
 
 
-        //this.camera.position.x += 0.1;
+
 
         this.renderer.render(this, this.getCamera());
         this.compruebaColision();
@@ -180,11 +175,13 @@ class MyScene extends Physijs.Scene {
     posicionarPinchos() {
 
     }
+
     posicionarGemas() {
 
     }
 
     posicionarPlataformas() {
+
         // La geometría es una caja con muy poca altura
         var geometryGround = new THREE.BoxGeometry(40, 2, 50);
 
@@ -222,6 +219,7 @@ class MyScene extends Physijs.Scene {
         this.createGround(350);
 
     }
+
     createGround(offset) {
         // El suelo es un Mesh, necesita una geometría y un material.
 
@@ -231,7 +229,7 @@ class MyScene extends Physijs.Scene {
         // El material se hará con una textura de madera
         var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
-        var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
+        var materialFis = new Physijs.createMaterial(materialGround, 0, 0);
 
         // Ya se puede construir el Mesh
         var ground = new Physijs.BoxMesh(geometryGround, materialFis, 0);
@@ -248,7 +246,7 @@ class MyScene extends Physijs.Scene {
         var texture = new THREE.TextureLoader().load('../imgs/ladrillo-difuso.png');
 
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
-        var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
+        var materialFis = new Physijs.createMaterial(materialGround, 0, 0);
         var fondo = new Physijs.BoxMesh(geometryGround, materialFis, 0);
 
         fondo.rotation.x = 1.5708;
@@ -265,7 +263,7 @@ class MyScene extends Physijs.Scene {
 
             }
         );
-        // Pa
+
         this.add(fondo);
     }
 
@@ -278,11 +276,14 @@ class MyScene extends Physijs.Scene {
         //   La razón de aspecto ancho/alto
         //   Los planos de recorte cercano y lejano
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
         // También se indica dónde se coloca
         this.camera.position.set(135, 70, 120);
+
         // Y hacia dónde mira
-        var look = new THREE.Vector3(135, 0, 0);
+        var look = new THREE.Vector3(100, 0, 0);
         this.camera.lookAt(look);
+
         this.add(this.camera);
 
         // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
@@ -384,12 +385,12 @@ class MyScene extends Physijs.Scene {
         var tecla = event.which || event.KeyCode;
 
         if (tecla == MyScene.SALTAR) {
-            // var fuerza = 20;
-            // var offset = new THREE.Vector3(0, 1, 0);
-            // var effect = offset.normalize().multiplyScalar(fuerza);
-            // this.physicBox.applyCentralImpulse(effect);
-            console.log('salto');
-            this.physicBox.position.y += 20;
+            var fuerza = 20;
+            var offset = new THREE.Vector3(0, 1, 0);
+            var effect = offset.normalize().multiplyScalar(fuerza);
+            this.physicBox.applyCentralImpulse(effect);
+            // this.physicBox.position.y += 20;
+            // this.physicBox.position.x += 2;
             this.physicBox.__dirtyPosition = true;
         }
 
