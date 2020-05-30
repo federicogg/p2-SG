@@ -22,17 +22,17 @@ class MyScene extends Physijs.Scene {
         this.setGravity(new THREE.Vector3(0, -100, 0));
 
         this.gui = this.createGUI();
-        this.createLights();
 
 
         // this.axis = new THREE.AxesHelper (7);
         // this.add (this.axis);
 
         this.createPlayer();
+        this.createLights();
 
         this.createGround(0);
 
-        this.createfondo(0);
+        this.createfondo(200);
 
         this.salida = new Salida();
         this.add(this.salida);
@@ -48,7 +48,6 @@ class MyScene extends Physijs.Scene {
         this.pinchos = [];
         this.gemas = [];
 
-        //this.createColliders();
 
         this.createObstaculos();
         this.createEscalera(4, 1);
@@ -79,7 +78,7 @@ class MyScene extends Physijs.Scene {
 
 
     createEscalera(num, index) {
-        var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
+        var texture = new THREE.TextureLoader().load('../imgs/escalera.png');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
         var materialFis = new Physijs.createMaterial(materialGround, 0, 0);
 
@@ -87,22 +86,16 @@ class MyScene extends Physijs.Scene {
 
         // var escalera = new THREE.Object3D();
         for (var i = 0; i < num; i++) {
-            var physicBox = new Physijs.BoxMesh(geometry, materialFis, 0);
-            physicBox.position.y += (i + 0.2) * 10;
-            physicBox.position.x += (i * 20) + 70 * index;
-            this.add(physicBox);
+            var platform = new Physijs.BoxMesh(geometry, materialFis, 0);
+            platform.position.y += (i + 0.2) * 10;
+            platform.position.x += (i * 20) + 70 * index;
+            this.add(platform);
         }
 
         //this.add(escalera);
 
     }
 
-    createColliders() {
-        this.collidersList = [];
-        this.collidersList.push(this.aro.transparentBox);
-        // this.collidersList.push(this.helices.h1);
-        // this.collidersList.push(this.helices.h2);
-    }
 
 
     compruebaColision() {
@@ -115,9 +108,10 @@ class MyScene extends Physijs.Scene {
             var directionVector = globalVertex.sub(this.physicBox.position);
 
             var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
-            var collisionResults = ray.intersectObjects(this.collidersList);
-            if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-                console.log('Colision');
+            var collidersGemas = ray.intersectObjects(this.collidersGemas);
+
+            if (collidersGemas.length > 0 && collidersGemas[0].distance < directionVector.length()) {
+                console.log('GEMA');
             }
         }
 
@@ -141,6 +135,7 @@ class MyScene extends Physijs.Scene {
 
 
         this.cameraUpdate();
+        this.updateSpotLight();
 
         this.renderer.render(this, this.getCamera());
         this.compruebaColision();
@@ -158,6 +153,7 @@ class MyScene extends Physijs.Scene {
         this.collidersHelices.push(this.he1.h2);
 
     }
+
     posicionarPinchos() {
         var pincho1 = new Pinchos(6);
         pincho1.rotation.y = 1.57;
@@ -186,6 +182,7 @@ class MyScene extends Physijs.Scene {
         this.add(gema);
 
         this.gemas.push(gema);
+        this.collidersGemas.push(gema.transparentBox);
 
     }
 
@@ -195,7 +192,7 @@ class MyScene extends Physijs.Scene {
         var geometryGround = new THREE.BoxGeometry(40, 2, 50);
 
 
-        var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
+        var texture = new THREE.TextureLoader().load('../imgs/suelo.png');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
         var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
 
@@ -211,11 +208,18 @@ class MyScene extends Physijs.Scene {
 
     }
 
+    posicionarAros() {
+        // var aro = new Aro();
+        // this.add(aro);
+        // this.collidersAros.push(aro.transparentBox);
+    }
+
     createObstaculos() {
         this.posicionarHelices();
         this.posicionarGemas();
         this.posicionarPlataformas();
         this.posicionarPinchos();
+        this.posicionarAros();
         this.createGround(350);
 
     }
@@ -227,7 +231,7 @@ class MyScene extends Physijs.Scene {
         var geometryGround = new THREE.BoxGeometry(200, 50, 50);
 
         // El material se hará con una textura de madera
-        var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
+        var texture = new THREE.TextureLoader().load('../imgs/suelo.png');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
         var materialFis = new Physijs.createMaterial(materialGround, 0, 0);
 
@@ -242,8 +246,8 @@ class MyScene extends Physijs.Scene {
 
     createfondo(offset) {
 
-        var geometryGround = new THREE.BoxGeometry(400, 0.1, 100);
-        var texture = new THREE.TextureLoader().load('../imgs/ladrillo-difuso.png');
+        var geometryGround = new THREE.BoxGeometry(1000, 0.1, 100);
+        var texture = new THREE.TextureLoader().load('../imgs/pared.png');
 
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
         var materialFis = new Physijs.createMaterial(materialGround, 0, 0);
@@ -271,8 +275,7 @@ class MyScene extends Physijs.Scene {
         this.camera.position.copy(this.physicBox.position);
 
 
-
-        this.camera.position.z += 100;
+        this.camera.position.z += 90;
         this.camera.position.x += 20;
         this.camera.position.y += 20;
 
@@ -331,6 +334,13 @@ class MyScene extends Physijs.Scene {
         return gui;
     }
 
+    updateSpotLight() {
+        this.spotLight.position.copy(this.physicBox.position);
+        this.spotLight.position.y += 40;
+        this.spotLight.position.x += 30;
+
+    }
+
     createLights() {
 
         var ambientLight = new THREE.AmbientLight(0xccddee, 0.35);
@@ -338,7 +348,8 @@ class MyScene extends Physijs.Scene {
         this.add(ambientLight);
 
         this.spotLight = new THREE.SpotLight(0xffffff, this.guiControls.lightIntensity);
-        this.spotLight.position.set(100, 100, 40);
+        this.spotLight.position.copy(this.physicBox.position);
+        this.spotLight.position.y += 100;
         this.add(this.spotLight);
     }
 

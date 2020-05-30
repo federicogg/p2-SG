@@ -4,11 +4,27 @@ class Gema extends THREE.Object3D {
         super();
         var material = new THREE.MeshStandardMaterial({ color: 0xe71111 });
         this.crearRombo(material);
+        this.createTransparentBox();
 
     }
 
     update() {
         this.rotation.y += 0.02;
+    }
+
+    createTransparentBox() {
+        var material = new THREE.MeshPhongMaterial({ visible: false });
+        var geometry = new THREE.BoxGeometry(5, 15, 15);
+
+
+        this.transparentBox = new THREE.Mesh(geometry, material);
+
+
+
+        this.transparentBox.position.copy(this.mesh.position);
+        this.transparentBox.position.y += 5;
+
+        this.add(this.transparentBox);
     }
 
     crearRombo(mat) {
@@ -27,10 +43,12 @@ class Gema extends THREE.Object3D {
         var geometry = new THREE.ExtrudeGeometry(shape, options);
 
 
-        var mesh = new THREE.Mesh(geometry, mat);
-        mesh.scale.set(0.75, 0.75, 0.75);
+        this.mesh = new THREE.Mesh(geometry, mat);
+        this.mesh.scale.set(0.75, 0.75, 0.75);
 
-        this.add(mesh);
+
+
+        this.add(this.mesh);
     }
 
 
