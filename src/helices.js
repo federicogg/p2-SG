@@ -1,16 +1,16 @@
-class helices extends THREE.Object3D{
-    constructor(){
+class helices extends THREE.Object3D {
+    constructor() {
         super();
 
         var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
         var geometry = new THREE.BoxGeometry(30, 0.5, 4);
 
         this.h1 = new THREE.Mesh(geometry, material);
-        this.h2 = new THREE.Mesh(geometry,material);
+        this.h2 = new THREE.Mesh(geometry, material);
 
-        this
+        //this
         this.h2.rotation.y = 1.57;
-        
+
         this.add(this.h1);
         this.add(this.h2);
 
@@ -18,7 +18,7 @@ class helices extends THREE.Object3D{
         this.position.y = 15;
     }
 
-    update(){
+    update() {
         this.rotation.x += 0.02;
     }
 }
