@@ -66,13 +66,13 @@ class MyScene extends Physijs.Scene {
         var materialPlayer = new THREE.MeshPhongMaterial({ color: 0xff0000 });
         var materialFis = new Physijs.createMaterial(materialPlayer, 0, 0);
 
-        var geometry = new THREE.BoxGeometry(4, 4, 4);
+        var geometry = new THREE.BoxGeometry(6, 6, 6);
 
         this.physicBox = new Physijs.BoxMesh(geometry, materialFis, 25);
         this.physicBox.position.y = 1;
         this.physicBox.position.x = -70;
 
-        var fuerza = 10;
+        var fuerza = 5;
         var offset = new THREE.Vector3(1, 0, 0);
         this.effect = offset.normalize().multiplyScalar(fuerza);
 
@@ -153,7 +153,7 @@ class MyScene extends Physijs.Scene {
         }
 
 
-
+        this.cameraUpdate();
 
         this.renderer.render(this, this.getCamera());
         this.compruebaColision();
@@ -267,6 +267,19 @@ class MyScene extends Physijs.Scene {
         this.add(fondo);
     }
 
+    cameraUpdate() {
+        this.camera.position.copy(this.physicBox.position);
+
+
+
+        this.camera.position.z += 100;
+        this.camera.position.x += 20;
+        this.camera.position.y += 20;
+
+        var look = this.physicBox.position;
+        this.camera.lookAt(look);
+    }
+
 
 
     createCamera() {
@@ -278,10 +291,12 @@ class MyScene extends Physijs.Scene {
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         // También se indica dónde se coloca
-        this.camera.position.set(135, 70, 120);
+        this.camera.position.copy(this.physicBox.position);
+        this.camera.position.z += 100;
+        this.camera.position.x += 20;
 
         // Y hacia dónde mira
-        var look = new THREE.Vector3(100, 0, 0);
+        var look = this.physicBox.position;
         this.camera.lookAt(look);
 
         this.add(this.camera);
@@ -324,7 +339,7 @@ class MyScene extends Physijs.Scene {
         this.add(ambientLight);
 
         this.spotLight = new THREE.SpotLight(0xffffff, this.guiControls.lightIntensity);
-        this.spotLight.position.set(60, 60, 40);
+        this.spotLight.position.set(100, 100, 40);
         this.add(this.spotLight);
     }
 
@@ -357,23 +372,23 @@ class MyScene extends Physijs.Scene {
 
         switch (tecla) {
             case MyScene.ABAJO:
-                this.physicBox.position.z += 1;
+                this.physicBox.position.z += 9;
                 this.physicBox.__dirtyPosition = true;
                 break;
             case MyScene.ARRIBA:
-                this.physicBox.position.z -= 1;
+                this.physicBox.position.z -= 9;
                 this.physicBox.__dirtyPosition = true;
                 break;
             case MyScene.IZQUIERDA:
-                var fuerza = 70;
+                var fuerza = 50;
                 var offset = new THREE.Vector3(1, 0, 0);
                 var effect = offset.normalize().multiplyScalar(fuerza);
                 this.physicBox.applyCentralImpulse(effect.negate());
                 break;
             case MyScene.DERECHA:
-                var fuerza = 10;
+                var fuerza = 50;
                 var offset = new THREE.Vector3(1, 0, 0);
-                var effect = offset.normalize().multiplyScalar(10);
+                var effect = offset.normalize().multiplyScalar(fuerza);
                 this.physicBox.applyCentralImpulse(effect);
                 break;
         }
@@ -385,13 +400,14 @@ class MyScene extends Physijs.Scene {
         var tecla = event.which || event.KeyCode;
 
         if (tecla == MyScene.SALTAR) {
-            var fuerza = 20;
-            var offset = new THREE.Vector3(0, 1, 0);
-            var effect = offset.normalize().multiplyScalar(fuerza);
-            this.physicBox.applyCentralImpulse(effect);
-            // this.physicBox.position.y += 20;
-            // this.physicBox.position.x += 2;
+            // var fuerza = 20;
+            // var offset = new THREE.Vector3(0, 0, 1);
+            // var effect = offset.normalize().multiplyScalar(fuerza);
+            // this.physicBox.applyCentralImpulse(effect);
+            this.saltando = true;
+            this.physicBox.position.y += 20;
             this.physicBox.__dirtyPosition = true;
+            this.saltando = false;
         }
 
     }
