@@ -1,7 +1,3 @@
-//import { ObjectLoader, SrcAlphaSaturateFactor } from "three";
-
-
-
 class MyScene extends Physijs.Scene {
     constructor(myCanvas) {
 
@@ -34,12 +30,9 @@ class MyScene extends Physijs.Scene {
 
         this.createPlayer();
 
-
         this.createGround(0);
 
-
         this.createfondo(0);
-        // this.add(this.fondo);
 
         this.salida = new Salida();
         this.add(this.salida);
@@ -53,6 +46,7 @@ class MyScene extends Physijs.Scene {
 
         this.helices = [];
         this.pinchos = [];
+        this.gemas = [];
 
         //this.createColliders();
 
@@ -64,12 +58,13 @@ class MyScene extends Physijs.Scene {
     createPlayer() {
 
         var materialPlayer = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+
         var materialFis = new Physijs.createMaterial(materialPlayer, 0, 0);
 
         var geometry = new THREE.BoxGeometry(6, 6, 6);
 
         this.physicBox = new Physijs.BoxMesh(geometry, materialFis, 25);
-        this.physicBox.position.y = 1;
+        this.physicBox.position.y = 2;
         this.physicBox.position.x = -70;
 
         var fuerza = 5;
@@ -140,6 +135,10 @@ class MyScene extends Physijs.Scene {
             this.helices[i].update();
         }
 
+        for (var i = 0; i < this.gemas.length; i++) {
+            this.gemas[i].update();
+        }
+
 
         this.cameraUpdate();
 
@@ -158,13 +157,35 @@ class MyScene extends Physijs.Scene {
         this.collidersHelices.push(this.he1.h1);
         this.collidersHelices.push(this.he1.h2);
 
-
     }
     posicionarPinchos() {
+        var pincho1 = new Pinchos(6);
+        pincho1.rotation.y = 1.57;
+        pincho1.position.set(150, 40, -10);
+        this.pinchos.push(pincho1);
 
+        this.add(pincho1);
+
+        pincho1 = new Pinchos(6);
+        pincho1.rotation.y = 1.57;
+        pincho1.position.set(150, 42, 20);
+        this.pinchos.push(pincho1);
+        this.add(pincho1);
+
+
+        pincho1 = new Pinchos(6);
+        pincho1.rotation.y = 1.57;
+        pincho1.position.set(300, 10, 10);
+        this.pinchos.push(pincho1);
+        this.add(pincho1);
     }
 
     posicionarGemas() {
+        var gema = new Gema();
+        gema.position.set(270, 50, 0);
+        this.add(gema);
+
+        this.gemas.push(gema);
 
     }
 
@@ -173,26 +194,15 @@ class MyScene extends Physijs.Scene {
         // La geometría es una caja con muy poca altura
         var geometryGround = new THREE.BoxGeometry(40, 2, 50);
 
-        // El material se hará con una textura de madera
+
         var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
         var materialFis = new Physijs.createMaterial(materialGround, 0, 0.1);
 
-        // Ya se puede construir el Mesh
         var p1 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
         p1.position.set(150, 32, 0);
-        var pincho1 = new Pinchos(6);
-        pincho1.rotation.y = 1.57;
-        pincho1.position.set(150, 40, -10);
-        this.pinchos.push(pincho1);
         this.add(p1);
-        this.add(pincho1);
 
-        pincho1 = new Pinchos(6);
-        pincho1.rotation.y = 1.57;
-        pincho1.position.set(150, 42, 20);
-        this.pinchos.push(pincho1);
-        this.add(pincho1);
 
         var p2 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
         p2.scale.x = 2;
@@ -203,7 +213,9 @@ class MyScene extends Physijs.Scene {
 
     createObstaculos() {
         this.posicionarHelices();
+        this.posicionarGemas();
         this.posicionarPlataformas();
+        this.posicionarPinchos();
         this.createGround(350);
 
     }
@@ -278,25 +290,24 @@ class MyScene extends Physijs.Scene {
         //   Los planos de recorte cercano y lejano
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-        // También se indica dónde se coloca
+
+        //Camara de juego
         this.camera.position.copy(this.physicBox.position);
         this.camera.position.z += 100;
         this.camera.position.x += 20;
-
-        // Y hacia dónde mira
         var look = this.physicBox.position;
-        this.camera.lookAt(look);
 
+        //Camara de desarrollo
+        // this.camera.position.set(300, 20, 200);
+        // var look = this.camera.position;
+        // look.z -= 100;
+
+
+
+
+        this.camera.lookAt(look);
         this.add(this.camera);
 
-        // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
-        // this.cameraControl = new THREE.TrackballControls (this.camera, this.renderer.domElement);
-        // Se configuran las velocidades de los movimientos
-        //this.cameraControl.rotateSpeed = 5;
-        //this.cameraControl.zoomSpeed = -2;
-        // this.cameraControl.panSpeed = 0.5;
-        // Debe orbitar con respecto al punto de mira de la cámara
-        // this.cameraControl.target = look;
     }
 
 
