@@ -245,7 +245,7 @@ class MyScene extends Physijs.Scene {
     }
 
     createSkyBox() {
-        var geometry = new THREE.BoxGeometry(1500, 1500, 1500);
+        var geometry = new THREE.BoxGeometry(1500, 500, 1500);
         var texture1 = new THREE.TextureLoader().load('../imgs/skybox/1.png');
         var texture2 = new THREE.TextureLoader().load('../imgs/skybox/2.png');
         var texture3 = new THREE.TextureLoader().load('../imgs/skybox/3.png');
@@ -296,12 +296,10 @@ class MyScene extends Physijs.Scene {
     }
 
     cameraUpdate() {
-        this.camera.position.copy(this.physicBox.position);
+
+        this.camera.position.x = this.physicBox.position.x;
 
 
-        this.camera.position.z += 90;
-        this.camera.position.x += 20;
-        this.camera.position.y += 20;
 
         var look = this.physicBox.position;
         this.camera.lookAt(look);
@@ -322,6 +320,7 @@ class MyScene extends Physijs.Scene {
         this.camera.position.copy(this.physicBox.position);
         this.camera.position.z += 100;
         this.camera.position.x += 20;
+        this.camera.position.y += 80;
         var look = this.physicBox.position;
 
         //Camara de desarrollo
