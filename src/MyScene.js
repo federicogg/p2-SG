@@ -101,6 +101,7 @@ class MyScene extends Physijs.Scene {
         //this.add(escalera);
 
     }
+
     createColliders() {
         this.collidersList = [];
         this.collidersList.push(this.aro.transparentBox);
@@ -108,19 +109,6 @@ class MyScene extends Physijs.Scene {
         // this.collidersList.push(this.helices.h2);
     }
 
-    createOctree() {
-
-        this.octree = new THREE.Octree({
-            undeferred: false,
-            depthMax: Infinity,
-            objectsThreshold: 4,
-            overlapPct: 0.2
-        });
-
-        //this.octree.add(this.transparentBox, { useFaces: true });
-        this.octree.add(this.physicBox, { useFaces: true });
-        //this.octree.add(this.physicCaja, { useFaces: true });
-    }
 
     compruebaColision() {
 
