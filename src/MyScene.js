@@ -130,9 +130,14 @@ class MyScene extends Physijs.Scene {
 
             var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
             var collidersGemas = ray.intersectObjects(this.collidersGemas);
+            var collidersAros = ray.intersectObjects(this.collidersAros);
 
             if (collidersGemas.length > 0 && collidersGemas[0].distance < directionVector.length()) {
                 console.log('GEMA');
+            }
+
+            if (collidersAros.length > 0 && collidersAros[0].distance < directionVector.length()) {
+                console.log('ARO');
             }
         }
 
@@ -208,7 +213,7 @@ class MyScene extends Physijs.Scene {
 
     posicionarPlataformas() {
 
-        // La geometría es una caja con muy poca altura
+
         var geometryGround = new THREE.BoxGeometry(40, 2, 50);
 
 
@@ -248,17 +253,14 @@ class MyScene extends Physijs.Scene {
     }
 
     createGround(offset) {
-        // El suelo es un Mesh, necesita una geometría y un material.
 
-        // La geometría es una caja con muy poca altura
         var geometryGround = new THREE.BoxGeometry(200, 50, 50);
 
-        // El material se hará con una textura de madera
         var texture = new THREE.TextureLoader().load('../imgs/suelo.png');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
         var materialFis = new Physijs.createMaterial(materialGround, 0, 0);
 
-        // Ya se puede construir el Mesh
+
         var ground = new Physijs.BoxMesh(geometryGround, materialFis, 0);
         ground.position.y = -25;
         ground.position.x = offset;
@@ -282,9 +284,8 @@ class MyScene extends Physijs.Scene {
         materials.push(new THREE.MeshBasicMaterial({ map: texture5, side: THREE.BackSide }));
         materials.push(new THREE.MeshBasicMaterial({ map: texture6, side: THREE.BackSide }));
 
-        var skyMaterial = new THREE.MeshFaceMaterial(materials);
 
-        var skyBox = new THREE.Mesh(geometry, skyMaterial);
+        var skyBox = new THREE.Mesh(geometry, materials);
         skyBox.position.x = 500;
         this.add(skyBox);
     }
@@ -388,7 +389,7 @@ class MyScene extends Physijs.Scene {
     updateSpotLight() {
         this.spotLight.position.copy(this.physicBox.position);
         this.spotLight.position.y += 40;
-        this.spotLight.position.x += 30;
+        this.spotLight.position.x += 50;
 
     }
 

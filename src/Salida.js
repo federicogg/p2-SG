@@ -2,7 +2,7 @@ class Salida extends THREE.Object3D {
     constructor() {
         super();
         var boxgeometry = new THREE.CylinderGeometry(3, 3, 1, 64);
-        var material = new THREE.MeshPhongMaterial({ color: 0x0033ff });
+        var material = new THREE.MeshBasicMaterial({ color: 0x0033ff });
         var caja1 = new THREE.Mesh(boxgeometry, material);
         var caja2 = new THREE.Mesh(boxgeometry, material);;
         var torogeometry = new THREE.TorusGeometry(20, 3, 16, 100, 3.1);

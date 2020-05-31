@@ -2,7 +2,7 @@ class Gema extends THREE.Object3D {
 
     constructor() {
         super();
-        var material = new THREE.MeshStandardMaterial({ color: 0xe71111 });
+        var material = new THREE.MeshBasicMaterial({ color: 0xff2e00 });
         this.crearRombo(material);
         this.createTransparentBox();
 
