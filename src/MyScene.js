@@ -28,7 +28,6 @@ class MyScene extends Physijs.Scene {
         // this.add (this.axis);
 
         this.createPlayer();
-        this.createLights();
 
         this.createGround(0);
 
@@ -51,8 +50,29 @@ class MyScene extends Physijs.Scene {
 
         this.createObstaculos();
         this.createEscalera(4, 1);
+        this.createLights();
+        this.createPointLights();
         this.createSkyBox();
 
+    }
+
+
+    createPointLights() {
+        var light = new THREE.PointLight(0xff0000, 0.5, 100);
+        light.position.set(-40, 10, -15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0xff0000, 0.5, 100);
+        light.position.set(-40, 10, 15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x17ff00, 0.5, 100);
+        light.position.set(40, 10, -15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x17ff00, 0.5, 100);
+        light.position.set(40, 10, 15);
+        this.add(light);
     }
 
     createPlayer() {
@@ -209,9 +229,12 @@ class MyScene extends Physijs.Scene {
     }
 
     posicionarAros() {
-        // var aro = new Aro();
-        // this.add(aro);
-        // this.collidersAros.push(aro.transparentBox);
+        var aro = new Aro();
+        aro.position.x = 400;
+        aro.position.z = -4;
+        aro.position.y = 20;
+        this.add(aro);
+        this.collidersAros.push(aro.transparentBox);
     }
 
     createObstaculos() {
@@ -244,7 +267,7 @@ class MyScene extends Physijs.Scene {
     }
 
     createSkyBox() {
-        var geometry = new THREE.BoxGeometry(1500, 500, 1500);
+        var geometry = new THREE.BoxGeometry(3000, 500, 1500);
         var texture1 = new THREE.TextureLoader().load('../imgs/skybox/1.png');
         var texture2 = new THREE.TextureLoader().load('../imgs/skybox/2.png');
         var texture3 = new THREE.TextureLoader().load('../imgs/skybox/3.png');
@@ -371,7 +394,7 @@ class MyScene extends Physijs.Scene {
 
     createLights() {
 
-        var ambientLight = new THREE.AmbientLight(0xccddee, 0.35);
+        var ambientLight = new THREE.AmbientLight(0xccddee, 0.1);
         // La añadimos a la escena
         this.add(ambientLight);
 
