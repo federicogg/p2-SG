@@ -122,7 +122,6 @@ class MyScene extends Physijs.Scene {
     update() {
 
         requestAnimationFrame(() => this.update())
-        this.spotLight.intensity = this.guiControls.lightIntensity;
 
         this.physicBox.applyCentralImpulse(this.effect);
 
@@ -297,12 +296,22 @@ class MyScene extends Physijs.Scene {
 
     cameraUpdate() {
 
-        this.camera.position.x = this.physicBox.position.x;
+        if (this.guiControls.design) {
+            this.camera.position.x = this.guiControls.x;
+            this.camera.position.y = this.guiControls.y;
+            this.camera.position.z += 100;
 
+            var look = this.camera.position;
+            look.z -= 100;
 
+        } else {
 
-        var look = this.physicBox.position;
-        this.camera.lookAt(look);
+            this.camera.position.x = this.physicBox.position.x;
+
+            var look = this.physicBox.position;
+            this.camera.lookAt(look);
+        }
+
     }
 
 
@@ -323,13 +332,6 @@ class MyScene extends Physijs.Scene {
         this.camera.position.y += 80;
         var look = this.physicBox.position;
 
-        //Camara de desarrollo
-        // this.camera.position.set(300, 20, 200);
-        // var look = this.camera.position;
-        // look.z -= 100;
-
-
-
 
         this.camera.lookAt(look);
         this.add(this.camera);
@@ -343,15 +345,18 @@ class MyScene extends Physijs.Scene {
 
 
         this.guiControls = new function() {
-            this.lightIntensity = 0.5;
-            this.axisOnOff = true;
+            this.design = false;
+            this.x = 0.0;
+            this.y = 92.0;
         }
 
 
-        var folder = gui.addFolder('Luz y Ejes');
+        var folder = gui.addFolder('Cámara');
 
 
-        folder.add(this.guiControls, 'lightIntensity', 0, 1, 0.1).name('Intensidad de la Luz : ');
+        folder.add(this.guiControls, 'design').name('Desarrollo: ');
+        folder.add(this.guiControls, 'x', 0.0, 1000.0, 0.1).name('X');
+        folder.add(this.guiControls, 'y', 92.0, 1000.0, 0.1).name('Y');
 
 
         return gui;
@@ -370,7 +375,7 @@ class MyScene extends Physijs.Scene {
         // La añadimos a la escena
         this.add(ambientLight);
 
-        this.spotLight = new THREE.SpotLight(0xffffff, this.guiControls.lightIntensity);
+        this.spotLight = new THREE.SpotLight(0xffffff, 0.35);
         this.spotLight.position.copy(this.physicBox.position);
         this.spotLight.position.y += 100;
         this.add(this.spotLight);
