@@ -1,3 +1,4 @@
+
 class MyScene extends Physijs.Scene {
     constructor(myCanvas) {
 
@@ -7,6 +8,7 @@ class MyScene extends Physijs.Scene {
         MyScene.ARRIBA = 38;
         MyScene.IZQUIERDA = 37;
         MyScene.DERECHA = 39;
+        
 
         // El gestor de hebras
         Physijs.scripts.worker = './physijs/physijs_worker.js'
@@ -14,7 +16,7 @@ class MyScene extends Physijs.Scene {
         // El motor de física de bajo nivel, en el cual se apoya Physijs
         Physijs.scripts.ammo = './ammo.js'
         super();
-
+        this.puntos = 0;
         // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
         this.renderer = this.createRenderer(myCanvas);
 
@@ -42,11 +44,12 @@ class MyScene extends Physijs.Scene {
         this.collidersHelices = [];
         this.collidersAros = [];
         this.collidersGemas = [];
+        this.colliderObjetivos = [];
+        this.colliderPinchos = [];
 
+   
         this.helices = [];
-        this.pinchos = [];
         this.gemas = [];
-
 
         this.createObstaculos();
         this.createEscalera(4, 1);
@@ -54,6 +57,16 @@ class MyScene extends Physijs.Scene {
         this.createPointLights();
         this.createSkyBox();
 
+        //Booleanos;
+        this.hayObjetivos = true;
+        this.hayAros = true;
+        this.hayHelices = true;
+        this.hayPinchos = true;
+        this.muerto = false;
+        this.bonus = false;
+
+
+        
     }
 
 
@@ -131,6 +144,9 @@ class MyScene extends Physijs.Scene {
             var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
             var collidersGemas = ray.intersectObjects(this.collidersGemas);
             var collidersAros = ray.intersectObjects(this.collidersAros);
+            var colliderObjetivos = ray.intersectObjects(this.colliderObjetivos );
+            var collidersHelices = ray.intersectObjects(this.collidersHelices);
+            var colliderPinchos = ray.intersectObjects(this.colliderPinchos);
 
             if (collidersGemas.length > 0 && collidersGemas[0].distance < directionVector.length()) {
                 console.log('GEMA');
@@ -138,6 +154,50 @@ class MyScene extends Physijs.Scene {
 
             if (collidersAros.length > 0 && collidersAros[0].distance < directionVector.length()) {
                 console.log('ARO');
+            }else{
+
+            }
+            if (colliderObjetivos.length > 0 && colliderObjetivos[0].distance < directionVector.length()) {
+                console.log('Objetivo');
+                if(this.hayObjetivos){
+                    this.puntos += 10;
+                    this.colliderObjetivos.shift();
+                    this.hayObjetivos = false;
+                    console.log(this.puntos);
+                }
+                
+
+            }else{
+                this.hayObjetivos= true;
+
+            }
+
+            if (collidersHelices.length > 0 && collidersHelices[0].distance < directionVector.length()) {
+                console.log('helice');
+                if(this.hayHelices){
+                    this.collidersHelices.shift();
+                    this.collidersHelices.shift();
+                    this.hayHelices = false;
+         
+                }
+                
+                
+              
+            }else{
+                this.hayHelices= true;
+            }
+
+            if (colliderPinchos.length > 0 && colliderPinchos[0].distance < directionVector.length()) {
+                console.log('Pinchos');
+                if(this.hayPinchos){
+                    this.colliderPinchos.shift();
+                    this.hayPinchos = false;
+                    this.muerto = true;
+                }
+                
+            }else{
+               
+                this.hayPinchos = true;
             }
         }
 
@@ -149,6 +209,8 @@ class MyScene extends Physijs.Scene {
         requestAnimationFrame(() => this.update())
 
         this.physicBox.applyCentralImpulse(this.effect);
+        //this.puntos += 0.1;
+     
 
         for (var i = 0; i < this.helices.length; i++) {
             this.helices[i].update();
@@ -168,6 +230,22 @@ class MyScene extends Physijs.Scene {
         this.simulate();
     }
 
+    posicionarObjetivos(){
+        var geometry = new THREE.BoxGeometry(1,8,8);
+        var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+
+        this.ob1 = new THREE.Mesh(geometry,material);
+        this.colliderObjetivos.push(this.ob1);
+        this.ob1.scale.set(1,6,5);
+        this.ob1.position.set(165,35,0);
+        this.add(this.ob1);
+
+        this.ob2 = this.ob1.clone();
+        this.ob2.position.copy(this.ob1.position);
+        this.ob2.position.x = this.ob2.position.x + 20;
+        this.add(this.ob2);
+
+    }
     posicionarHelices() {
 
 
@@ -180,24 +258,28 @@ class MyScene extends Physijs.Scene {
     }
 
     posicionarPinchos() {
+        this.pincho = new Pinchos(6);
+        this.colliderPinchos.push(this.pincho.sphere);
+        this.pincho.position.x = -10;
+        this.add(this.pincho);
         var pincho1 = new Pinchos(6);
         pincho1.rotation.y = 1.57;
         pincho1.position.set(150, 40, -10);
-        this.pinchos.push(pincho1);
+        this.colliderPinchos.push(pincho1);
 
         this.add(pincho1);
 
         pincho1 = new Pinchos(6);
         pincho1.rotation.y = 1.57;
         pincho1.position.set(150, 42, 20);
-        this.pinchos.push(pincho1);
+        this.colliderPinchos.push(pincho1.sphere);
         this.add(pincho1);
 
 
         pincho1 = new Pinchos(6);
         pincho1.rotation.y = 1.57;
         pincho1.position.set(300, 10, 10);
-        this.pinchos.push(pincho1);
+        this.colliderPinchos.push(pincho1.sphere);
         this.add(pincho1);
     }
 
@@ -205,7 +287,6 @@ class MyScene extends Physijs.Scene {
         var gema = new Gema();
         gema.position.set(270, 50, 0);
         this.add(gema);
-
         this.gemas.push(gema);
         this.collidersGemas.push(gema.transparentBox);
 
@@ -248,6 +329,7 @@ class MyScene extends Physijs.Scene {
         this.posicionarPlataformas();
         this.posicionarPinchos();
         this.posicionarAros();
+        this.posicionarObjetivos();
         this.createGround(350);
 
     }
@@ -330,10 +412,10 @@ class MyScene extends Physijs.Scene {
 
         } else {
 
-            this.camera.position.x = this.physicBox.position.x;
-
-            var look = this.physicBox.position;
-            this.camera.lookAt(look);
+              this.camera.position.x = this.physicBox.position.x;
+              var vector3 = new THREE.Vector3(this.physicBox.position.x,this.physicBox.position.y,0 );
+              var look = this.physicBox.position;
+              this.camera.lookAt(vector3);
         }
 
     }
@@ -434,11 +516,11 @@ class MyScene extends Physijs.Scene {
 
         switch (tecla) {
             case MyScene.ABAJO:
-                this.physicBox.position.z += 9;
+                this.physicBox.position.z += 2;
                 this.physicBox.__dirtyPosition = true;
                 break;
             case MyScene.ARRIBA:
-                this.physicBox.position.z -= 9;
+                this.physicBox.position.z -= 2;
                 this.physicBox.__dirtyPosition = true;
                 break;
             case MyScene.IZQUIERDA:

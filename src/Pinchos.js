@@ -25,5 +25,13 @@ class Pinchos extends THREE.Object3D {
             cone.position.x = i * 5;
             this.add(cone);
         }
+
+        var geometrysphere = new THREE.SphereGeometry( 5*num/3, 32, 32 );
+        var materialsphere = new THREE.MeshBasicMaterial({ visible: false });
+        this.sphere = new THREE.Mesh( geometrysphere, materialsphere );
+        this.sphere.scale.set(0.8,1.2,1);
+       
+        this.sphere.position.x =2.5;
+        this.add( this.sphere );
     }
 }
