@@ -2,7 +2,7 @@ class Pinchos extends THREE.Object3D {
     constructor(num) {
         super();
         this.radius = 5;
-        //var geometry = new THREE.CylinderGeometry(1, 5, 20);
+
         var geometry = new THREE.ConeGeometry(5, 20, 32);
         var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 
@@ -26,12 +26,12 @@ class Pinchos extends THREE.Object3D {
             this.add(cone);
         }
 
-        var geometrysphere = new THREE.SphereGeometry( 5*num/3, 32, 32 );
+        var geometrysphere = new THREE.SphereGeometry(5 * num / 3, 32, 32);
         var materialsphere = new THREE.MeshBasicMaterial({ visible: false });
-        this.sphere = new THREE.Mesh( geometrysphere, materialsphere );
-        this.sphere.scale.set(0.8,1.2,1);
-       
-        this.sphere.position.x =2.5;
-        this.add( this.sphere );
+        this.sphere = new THREE.Mesh(geometrysphere, materialsphere);
+        this.sphere.scale.set(0.8, 1.2, 1);
+
+        this.sphere.position.x = 2.5;
+        this.add(this.sphere);
     }
 }

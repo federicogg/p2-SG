@@ -1,4 +1,3 @@
-
 class MyScene extends Physijs.Scene {
     constructor(myCanvas) {
 
@@ -11,7 +10,7 @@ class MyScene extends Physijs.Scene {
         MyScene.SUELO = 1;
         MyScene.ENBONUS = 0;
         MyScene.INICIO = 1;
-        MyScene.MUERTO = 0; 
+        MyScene.MUERTO = 0;
 
         // El gestor de hebras
         Physijs.scripts.worker = './physijs/physijs_worker.js'
@@ -29,14 +28,13 @@ class MyScene extends Physijs.Scene {
         this.gui = this.createGUI();
 
 
-        // this.axis = new THREE.AxesHelper (7);
-        // this.add (this.axis);
+        this.axis = new THREE.AxesHelper(7);
+        this.add(this.axis);
 
         this.createPlayer();
 
         this.createGround(0);
 
-        //this.createfondo(200);
 
         this.salida = new Salida();
         this.add(this.salida);
@@ -54,6 +52,7 @@ class MyScene extends Physijs.Scene {
         this.helices = [];
         this.gemas = [];
         this.aros = [];
+        this.martillos = [];
 
         this.createObstaculos();
         this.createEscalera(4, 1);
@@ -91,12 +90,45 @@ class MyScene extends Physijs.Scene {
         light.position.set(-40, 10, 15);
         this.add(light);
 
-        var light = new THREE.PointLight(0x17ff00, 0.5, 100);
+        var light = new THREE.PointLight(0xff0000, 0.5, 100);
         light.position.set(40, 10, -15);
         this.add(light);
 
-        var light = new THREE.PointLight(0x17ff00, 0.5, 100);
+        var light = new THREE.PointLight(0xff0000, 0.5, 100);
         light.position.set(40, 10, 15);
+        this.add(light);
+
+
+        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
+        light.position.set(430, 10, 15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
+        light.position.set(430, 10, -15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
+        light.position.set(270, 10, 15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
+        light.position.set(270, 10, -15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
+        light.position.set(520, 10, -15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
+        light.position.set(520, 10, 15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
+        light.position.set(670, 10, -15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
+        light.position.set(670, 10, 15);
         this.add(light);
     }
 
@@ -140,16 +172,14 @@ class MyScene extends Physijs.Scene {
             platform.position.y += (i + 0.2) * 10;
             platform.position.x += (i * 20) + 70 * index;
             platform.addEventListener('collision',
-                function (o, v, r, n) {
-                    // Si el objeto que colisiona con el suelo es colisionable, se le quita el modo alambre
+                function(o, v, r, n) {
+
                     MyScene.SUELO = 1;
                 }
 
             );
             this.add(platform);
         }
-
-        //this.add(escalera);
 
     }
 
@@ -233,7 +263,7 @@ class MyScene extends Physijs.Scene {
                 if (this.hayPinchos) {
                     this.hayPinchos = false;
                     MyScene.MUERTO = 1;
-               }
+                }
 
             } else {
 
@@ -261,8 +291,9 @@ class MyScene extends Physijs.Scene {
 
         console.log(this.contador);
     }
-    reiniciaJuego(){
-        
+
+    reiniciaJuego() {
+
         var fin = document.getElementById('fin');
         var score = document.getElementById('panel');
 
@@ -279,28 +310,29 @@ class MyScene extends Physijs.Scene {
         c.appendChild(e);
 
         this.remove(this.physicBox);
-        
+
     }
+
+
     update() {
-        if(!MyScene.MUERTO){
+        if (!MyScene.MUERTO) {
             requestAnimationFrame(() => this.update());
         }
-        
 
-        if(MyScene.MUERTO){
+
+        if (MyScene.MUERTO) {
             this.reiniciaJuego()
-        }else{
+        } else {
             if (!MyScene.INICIO) {
                 this.physicBox.applyCentralImpulse(this.effect);
             }
         }
-      
 
-    
 
         if (MyScene.ENBONUS) {
             this.incrementarTiempo();
         }
+
         for (var i = 0; i < this.helices.length; i++) {
             this.helices[i].update();
         }
@@ -317,7 +349,8 @@ class MyScene extends Physijs.Scene {
         this.compruebaColision();
 
         this.simulate();
-    
+        TWEEN.update();
+
     }
 
     posicionarObjetivos() {
@@ -351,10 +384,11 @@ class MyScene extends Physijs.Scene {
     }
 
     posicionarPinchos() {
-        this.pincho = new Pinchos(6);
-        this.colliderPinchos.push(this.pincho.sphere);
-        this.pincho.position.x = -10;
-        this.add(this.pincho);
+        // this.pincho = new Pinchos(6);
+        // this.colliderPinchos.push(this.pincho.sphere);
+        // this.pincho.position.x = -10;
+        // this.add(this.pincho);
+
         var pincho1 = new Pinchos(6);
         pincho1.rotation.y = 1.57;
         pincho1.position.set(150, 40, -10);
@@ -383,6 +417,12 @@ class MyScene extends Physijs.Scene {
         this.gemas.push(gema);
         this.collidersGemas.push(gema.transparentBox);
 
+        var gema = new Gema();
+        gema.position.set(470, 13, 13);
+        this.add(gema);
+        this.gemas.push(gema);
+        this.collidersGemas.push(gema.transparentBox);
+
     }
 
     posicionarPlataformas() {
@@ -399,37 +439,61 @@ class MyScene extends Physijs.Scene {
         p1.position.set(150, 32, 0);
         this.add(p1);
 
-
         var p2 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
         p2.scale.x = 2;
         p2.position.set(220, 32, 0);
         this.add(p2);
 
+        // var p3 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+        // p3.scale.x = 2;
+        // p3.position.set(240, 32, 0);
+        // this.add(p3);
+
         p1.addEventListener('collision',
-            function (o, v, r, n) {
-                // Si el objeto que colisiona con el suelo es colisionable, se le quita el modo alambre
+            function(o, v, r, n) {
                 MyScene.SUELO = 1;
             }
 
         );
         p2.addEventListener('collision',
-            function (o, v, r, n) {
-                // Si el objeto que colisiona con el suelo es colisionable, se le quita el modo alambre
+            function(o, v, r, n) {
                 MyScene.SUELO = 1;
             }
 
         );
 
+        // p3.addEventListener('collision',
+        //     function(o, v, r, n) {
+        //         MyScene.SUELO = 1;
+        //     }
+
+        // );
+
     }
 
     posicionarAros() {
         var aro = new Aro();
-        aro.position.x = 400;
+        aro.position.x = 370;
         aro.position.z = -4;
         aro.position.y = 20;
         this.add(aro);
         this.collidersAros.push(aro.transparentBox);
         this.aros.push(aro);
+    }
+
+    posicionarMartillos() {
+        var martillo = new Martillo();
+        this.martillos.push(martillo);
+
+        this.add(martillo);
+
+        var martillo = new Martillo();
+        this.martillos.push(martillo);
+        martillo.position.x = 470;
+        martillo.position.z = -35;
+        martillo.rotation.y = 1.57;
+
+        this.add(martillo);
     }
 
     createObstaculos() {
@@ -439,7 +503,9 @@ class MyScene extends Physijs.Scene {
         this.posicionarPinchos();
         this.posicionarAros();
         this.posicionarObjetivos();
+        this.posicionarMartillos();
         this.createGround(350);
+        this.createGround(590);
 
     }
 
@@ -456,7 +522,7 @@ class MyScene extends Physijs.Scene {
         ground.position.y = -25;
         ground.position.x = offset;
         ground.addEventListener('collision',
-            function (o, v, r, n) {
+            function(o, v, r, n) {
                 // Si el objeto que colisiona con el suelo es colisionable, se le quita el modo alambre
                 MyScene.SUELO = 1;
                 console.log(MyScene.SUELO);
@@ -467,7 +533,7 @@ class MyScene extends Physijs.Scene {
     }
 
     createSkyBox() {
-        var geometry = new THREE.BoxGeometry(3000, 500, 1500);
+        var geometry = new THREE.BoxGeometry(6000, 500, 1500);
         var texture1 = new THREE.TextureLoader().load('../imgs/skybox/1.png');
         var texture2 = new THREE.TextureLoader().load('../imgs/skybox/2.png');
         var texture3 = new THREE.TextureLoader().load('../imgs/skybox/3.png');
@@ -484,7 +550,7 @@ class MyScene extends Physijs.Scene {
 
 
         var skyBox = new THREE.Mesh(geometry, materials);
-        skyBox.position.x = 500;
+        skyBox.position.x = 1900;
         this.add(skyBox);
     }
 
@@ -504,7 +570,7 @@ class MyScene extends Physijs.Scene {
         fondo.position.x = offset;
 
         fondo.addEventListener('collision',
-            function (o, v, r, n) {
+            function(o, v, r, n) {
                 // Los figuras colisionables que colisonen con las paredes se les pone otra vez en modo alambre
                 // console.log(r);
                 o.position.z += 3;
@@ -521,7 +587,7 @@ class MyScene extends Physijs.Scene {
         if (this.guiControls.design) {
             this.camera.position.x = this.guiControls.x;
             this.camera.position.y = this.guiControls.y;
-            this.camera.position.z += 100;
+            this.camera.position.z = this.guiControls.z;
 
             var look = this.camera.position;
             look.z -= 100;
@@ -566,10 +632,11 @@ class MyScene extends Physijs.Scene {
         var gui = new dat.GUI();
 
 
-        this.guiControls = new function () {
+        this.guiControls = new function() {
             this.design = false;
             this.x = 0.0;
             this.y = 92.0;
+            this.z = 200.0;
         }
 
 
@@ -577,8 +644,9 @@ class MyScene extends Physijs.Scene {
 
 
         folder.add(this.guiControls, 'design').name('Desarrollo: ');
-        folder.add(this.guiControls, 'x', 0.0, 1000.0, 0.1).name('X');
-        folder.add(this.guiControls, 'y', 92.0, 1000.0, 0.1).name('Y');
+        folder.add(this.guiControls, 'x', 0.0, 5000.0, 0.1).name('X');
+        folder.add(this.guiControls, 'y', 0.0, 1000.0, 0.1).name('Y');
+        folder.add(this.guiControls, 'z', 0.0, 1000.0, 0.1).name('Z');
 
 
         return gui;
@@ -642,9 +710,9 @@ class MyScene extends Physijs.Scene {
                 break;
             case MyScene.ARRIBA:
                 this.fuerzArriba += 2;
-               /* var offset = new THREE.Vector3(0, 0, 1);
-                var effect = offset.normalize().multiplyScalar(this.fuerzArriba);
-                this.physicBox.applyCentralImpulse(effect.negate());*/
+                /* var offset = new THREE.Vector3(0, 0, 1);
+                 var effect = offset.normalize().multiplyScalar(this.fuerzArriba);
+                 this.physicBox.applyCentralImpulse(effect.negate());*/
                 this.physicBox.position.z -= 0.5;
                 this.physicBox.__dirtyPosition = true;
                 break;
@@ -667,26 +735,26 @@ class MyScene extends Physijs.Scene {
     eventosSueltaTecla(event) {
 
         var tecla = event.which || event.KeyCode;
-/*
-        switch (tecla) {
-            case MyScene.ARRIBA:
-              
-                var offset = new THREE.Vector3(0, 0, 1);
-                var effect = offset.normalize().multiplyScalar(this.fuerzArriba * 6);
-                this.physicBox.applyCentralImpulse(effect);
-                this.fuerzArriba = 0;
-             
-                break;
-            case MyScene.ABAJO:
+        /*
+                switch (tecla) {
+                    case MyScene.ARRIBA:
+                      
+                        var offset = new THREE.Vector3(0, 0, 1);
+                        var effect = offset.normalize().multiplyScalar(this.fuerzArriba * 6);
+                        this.physicBox.applyCentralImpulse(effect);
+                        this.fuerzArriba = 0;
+                     
+                        break;
+                    case MyScene.ABAJO:
+                        
+                        var offset = new THREE.Vector3(0, 0, 1);
+                        var effect = offset.normalize().multiplyScalar(this.fuerzaAbajo * 6);
+                        this.physicBox.applyCentralImpulse(effect.negate());
+                        this.fuerzaAbajo = 0;
+                        break;
+                }
                 
-                var offset = new THREE.Vector3(0, 0, 1);
-                var effect = offset.normalize().multiplyScalar(this.fuerzaAbajo * 6);
-                this.physicBox.applyCentralImpulse(effect.negate());
-                this.fuerzaAbajo = 0;
-                break;
-        }
-        
-    */
+            */
 
         if (tecla == MyScene.SALTAR && MyScene.SUELO && !MyScene.INICIO) {
             this.saltando = true;
@@ -707,7 +775,7 @@ class MyScene extends Physijs.Scene {
         }
 
         if (MyScene.MUERTO && tecla == MyScene.SALTAR) {
-           location.reload();
+            location.reload();
         }
 
     }
@@ -732,7 +800,7 @@ class MyScene extends Physijs.Scene {
 }
 
 /// La función   main
-$(function () {
+$(function() {
 
     // Se instancia la escena pasándole el  div  que se ha creado en el html para visualizar
     var scene = new MyScene("#WebGL-output");

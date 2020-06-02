@@ -8,8 +8,7 @@ class helices extends THREE.Object3D {
         this.h1 = new THREE.Mesh(geometry, material);
         this.h2 = new THREE.Mesh(geometry, material);
 
-     
-        //this
+
         this.h2.rotation.y = 1.57;
 
         this.add(this.h1);

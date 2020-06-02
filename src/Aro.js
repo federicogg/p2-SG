@@ -24,14 +24,10 @@ class Aro extends THREE.Object3D {
     createTransparentBox() {
         var material = new THREE.MeshBasicMaterial({ visible: false });
         var geometry = new THREE.BoxGeometry(5, 10, 15);
-        // var materialFis = new Physijs.createMaterial(material, 0.3, 0.2);
 
-        //var materialFis = new Physijs.createMaterial(material, 0.3, 0.2);
-        //this.transparentBox = new Physijs.BoxMesh(geometry, materialFis, 0);
 
         this.transparentBox = new THREE.Mesh(geometry, material);
-        //this.transparentBox.rotation.y = 1.57;
-        //  this.transparentBox = new Physijs.BoxMesh(geometry, materialFis, 0);
+
 
         this.transparentBox.position.copy(this.aro.position);
         this.add(this.transparentBox);
