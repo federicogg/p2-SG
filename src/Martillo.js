@@ -1,12 +1,14 @@
-class Martillo extends THREE.Object3D {
+class Martillo {
+
     constructor() {
-        super();
 
-        this.createHead();
-        this.createHandle();
-        this.createTweens();
+        this.mesh = this.createHandle();
+        this.mesh.position.y = 15;
+        this.mesh.rotation.y = 4.75;
+    }
 
-     
+    getMesh() {
+        return this.mesh;
     }
 
     createHead() {
@@ -16,59 +18,31 @@ class Martillo extends THREE.Object3D {
         var materialFis = new Physijs.createMaterial(material, 0, 0);
         var mesh = new Physijs.CylinderMesh(geometry, materialFis, 0);
 
-        mesh.addEventListener('collision',
-            function(o, v, r, n) {
 
-                console.log("GGGG");
-            }
-
-        );
-
-        mesh.position.y = 30;
+        mesh.position.y = 9.5;
         mesh.rotation.z += 1.65;
 
-        this.add(mesh);
+
+        return mesh;
     }
 
     createHandle() {
         var geometry = new THREE.CylinderGeometry(2, 2, 30, 32);
         var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
         var material = new THREE.MeshBasicMaterial({ map: texture });
-        var mesh = new THREE.Mesh(geometry, material);
+        var materialFis = new Physijs.createMaterial(material, 0, 0);
+        var mesh = new Physijs.CylinderMesh(geometry, materialFis, 0);
 
         mesh.position.y = 15;
 
-        this.add(mesh);
+        var headMesh = this.createHead();
+        mesh.add(headMesh);
+
+        return mesh;
     }
 
-    createTweens() {
 
-        var origen = { x: 0.0 };
-        this.parametro = 0;
-        var destino = { x: 1.4 };
-        this.loop1 = 2000;
-        this.movimiento = new TWEEN.Tween(origen).to(destino, this.loop1);
-        this.movimiento.easing(TWEEN.Easing.Quadratic.InOut);
 
-        var that = this;
 
-        this.movimiento.onUpdate(function() {
-            that.rotation.z = origen.x;
-        });
-
-        this.loop2 = 2000;
-        var origen2 = { x: 1.4 };
-        var destino2 = { x: 0.0 };
-        this.movimiento2 = new TWEEN.Tween(origen2).to(destino2, this.loop2);
-        this.movimiento2.easing(TWEEN.Easing.Quadratic.InOut);
-
-        this.movimiento2.onUpdate(function() {
-            that.rotation.z = origen2.x;
-        });
-
-        this.movimiento.chain(this.movimiento2);
-        this.movimiento2.chain(this.movimiento);
-        this.movimiento2.start();
-    }
 
 }
