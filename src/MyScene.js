@@ -370,6 +370,7 @@ class MyScene extends Physijs.Scene {
         this.add(this.ob2);
 
     }
+
     posicionarHelices() {
 
 

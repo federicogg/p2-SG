@@ -15,7 +15,7 @@ class Martillo extends THREE.Object3D {
         var geometry = new THREE.CylinderGeometry(5, 5, 10, 15);
         var material = new THREE.MeshBasicMaterial({ color: 0x000000 });
         var materialFis = new Physijs.createMaterial(material, 0, 0);
-        var mesh = new Physijs.CylinderMesh(geometry, materialFis);
+        var mesh = new Physijs.CylinderMesh(geometry, materialFis, 0);
 
         mesh.addEventListener('collision',
             function(o, v, r, n) {
