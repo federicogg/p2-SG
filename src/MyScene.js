@@ -131,6 +131,14 @@ class MyScene extends Physijs.Scene {
         var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
         light.position.set(670, 10, 15);
         this.add(light);
+
+        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
+        light.position.set(910, 60, 15);
+        this.add(light);
+
+        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
+        light.position.set(910, 60, -15);
+        this.add(light);
     }
 
     createPlayer() {
@@ -492,6 +500,18 @@ class MyScene extends Physijs.Scene {
         pincho2.position.z -= 20;
         this.colliderPinchos.push(pincho2.sphere);
         this.add(pincho2);
+
+        var pincho3 = new Pinchos(6);
+        pincho3.position.x = 875;
+        pincho3.position.y = 45;
+        pincho3.position.z -= 12;
+        this.colliderPinchos.push(pincho3.sphere);
+        this.add(pincho3);
+
+        var pincho4 = pincho3.clone();
+        pincho4.position.z += 30;
+        this.colliderPinchos.push(pincho4.sphere);
+        this.add(pincho4);
     }
 
     posicionarGemas() {
@@ -528,10 +548,10 @@ class MyScene extends Physijs.Scene {
         p2.position.set(220, 32, 0);
         this.add(p2);
 
-        // var p3 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
-        // p3.scale.x = 2;
-        // p3.position.set(240, 32, 0);
-        // this.add(p3);
+        var p3 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+        p3.scale.x = 2;
+        p3.position.set(900, 32, 0);
+        this.add(p3);
 
         p1.addEventListener('collision',
             function(o, v, r, n) {
@@ -546,12 +566,12 @@ class MyScene extends Physijs.Scene {
 
         );
 
-        // p3.addEventListener('collision',
-        //     function(o, v, r, n) {
-        //         MyScene.SUELO = 1;
-        //     }
+        p3.addEventListener('collision',
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
 
-        // );
+        );
 
     }
 
@@ -582,16 +602,18 @@ class MyScene extends Physijs.Scene {
         meshMartillo.position.x -= 50;
         this.add(meshMartillo);
 
+        martillo = new Martillo();
 
+        var meshMartillo = martillo.getMesh();
+        this.martillos.push(meshMartillo);
+        meshMartillo.position.x = 850;
+        meshMartillo.position.y = 50;
+        this.add(meshMartillo);
 
-        // var martillo = new Martillo(this);
-        // this.martillos.push(martillo);
-        // martillo.position.x = 470;
-        // martillo.position.z = -20;
-        // martillo.rotation.y = 1.57;
+        for (let i = 0; i < this.martillos.length; i++) {
+            this.createTweensMartillo(i);
+        }
 
-        // this.add(martillo);
-        this.createTweensMartillo(0);
 
     }
 
@@ -775,7 +797,7 @@ class MyScene extends Physijs.Scene {
 
     createLights() {
 
-        var ambientLight = new THREE.AmbientLight(0xccddee, 0.1);
+        var ambientLight = new THREE.AmbientLight(0x404040, 0.01);
         // La añadimos a la escena
         this.add(ambientLight);
 
@@ -819,7 +841,7 @@ class MyScene extends Physijs.Scene {
                 var offset = new THREE.Vector3(0, 0, 1);
                 var effect = offset.normalize().multiplyScalar(this.fuerzaAbajo);
                 this.physicBox.applyCentralImpulse(effect);*/
-                this.physicBox.position.z += 0.5;
+                this.physicBox.position.z += 1;
                 this.physicBox.__dirtyPosition = true;
                 break;
             case MyScene.ARRIBA:
@@ -827,7 +849,7 @@ class MyScene extends Physijs.Scene {
                 /* var offset = new THREE.Vector3(0, 0, 1);
                  var effect = offset.normalize().multiplyScalar(this.fuerzArriba);
                  this.physicBox.applyCentralImpulse(effect.negate());*/
-                this.physicBox.position.z -= 0.5;
+                this.physicBox.position.z -= 1;
                 this.physicBox.__dirtyPosition = true;
                 break;
             case MyScene.IZQUIERDA:
@@ -858,8 +880,6 @@ class MyScene extends Physijs.Scene {
             var effect = offset.normalize().multiplyScalar(fuerza);
             this.physicBox.applyCentralImpulse(effect);
 
-            //this.physicBox.position.y += 20;
-            // this.physicBox.__dirtyPosition = true;
             this.saltando = false;
         }
 
@@ -905,7 +925,6 @@ $(function() {
     window.addEventListener("resize", () => scene.onWindowResize());
     window.addEventListener("keydown", (event) => scene.eventosTeclado(event));
     window.addEventListener("keyup", (event) => scene.eventosSueltaTecla(event));
-    // Que no se nos olvide, la primera visualización.
 
     scene.update();
 });
