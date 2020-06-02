@@ -47,6 +47,7 @@ class MyScene extends Physijs.Scene {
         this.collidersGemas = [];
         this.colliderObjetivos = [];
         this.colliderPinchos = [];
+        this.colliderSkyBox = [];
 
 
         this.helices = [];
@@ -152,6 +153,10 @@ class MyScene extends Physijs.Scene {
         this.physicBox.radio = 4;
         this.add(this.physicBox);
 
+        this.antiguaPos = this.physicBox.position.x;
+     
+
+
     }
 
     incrementaPuntos(pts) {
@@ -200,7 +205,7 @@ class MyScene extends Physijs.Scene {
             var colliderObjetivos = ray.intersectObjects(this.colliderObjetivos);
             var collidersHelices = ray.intersectObjects(this.collidersHelices);
             var colliderPinchos = ray.intersectObjects(this.colliderPinchos);
-
+            var colliderSkyBox = ray.intersectObjects(this.colliderSkyBox);
             if (collidersGemas.length > 0 && collidersGemas[0].distance < directionVector.length()) {
                 console.log('GEMA');
                 var index = this.collidersGemas.indexOf(collidersGemas[0].object);
@@ -269,6 +274,15 @@ class MyScene extends Physijs.Scene {
 
                 this.hayPinchos = true;
             }
+
+            if (colliderSkyBox.length > 0 && colliderSkyBox[0].distance < directionVector.length()) {
+            
+                    MyScene.MUERTO = 1;
+                
+
+            }
+
+            
         }
 
 
@@ -321,6 +335,7 @@ class MyScene extends Physijs.Scene {
 
 
         if (MyScene.MUERTO) {
+            document.getElementById('audio').pause();
             this.reiniciaJuego()
         } else {
             if (!MyScene.INICIO) {
@@ -341,7 +356,7 @@ class MyScene extends Physijs.Scene {
             this.gemas[i].update();
         }
 
-
+        this.barraupdate();
         this.cameraUpdate();
         this.updateSpotLight();
 
@@ -353,6 +368,10 @@ class MyScene extends Physijs.Scene {
 
     }
 
+    barraupdate(){
+    
+
+    }
     posicionarObjetivos() {
         var geometry = new THREE.BoxGeometry(1, 8, 8);
         var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
@@ -369,18 +388,77 @@ class MyScene extends Physijs.Scene {
         this.colliderObjetivos.push(this.ob2)
         this.add(this.ob2);
 
+
+        var ob3 = this.ob2.clone();
+        ob3.position.copy(this.ob2.position);
+        ob3.position.x += 70;
+        this.colliderObjetivos.push(ob3);
+        this.add(ob3);
+
+        var ob4 = ob3.clone();
+        ob4.position.copy(ob3.position);
+        ob4.position.x +=180;
+        ob4.position.y -= 20;
+        this.colliderObjetivos.push(ob4);
+        this.add(ob4);
+
+        var ob5 = ob4.clone();
+        ob5.position.copy(ob4.position);
+        ob5.position.x +=70;
+        
+        this.colliderObjetivos.push(ob5);
+        this.add(ob5);
+
+        var ob6 = ob5.clone();
+        ob6.position.copy(ob5.position);
+        ob6.position.x +=160;
+        
+        this.colliderObjetivos.push(ob6);
+        this.add(ob6);
+        
+        
+        
+
     }
 
     posicionarHelices() {
 
 
         this.he1 = new helices();
-        this.he1.h1.index = 0;
-        this.he1.h2.index = 0;
         this.helices.push(this.he1);
         this.add(this.he1);
         this.collidersHelices.push(this.he1.h1);
         this.collidersHelices.push(this.he1.h2);
+
+        var he2 = this.he1.clone();
+        he2.position.copy(this.he1.position);
+        he2.position.x += 220;
+        he2.position.y += 40;
+        this.helices.push(he2);
+        this.collidersHelices.push(he2.h1);
+        this.collidersHelices.push(he2.h2);
+        this.add(he2);
+
+        var he3 = he2.clone();
+        he3.position.copy(he2.position);
+        he3.position.x += 340;
+        he3.position.y -= 40;
+        he3.position.z += 15;
+        this.helices.push(he3);
+        this.collidersHelices.push(he3.h1);
+        this.collidersHelices.push(he3.h2);
+        this.add(he3);
+
+        var he4 = he3.clone();
+        he4.position.copy(he3.position);
+        he4.position.x += 40;
+        he4.position.z -= 30;
+        this.helices.push(he4);
+        this.collidersHelices.push(he4.h1);
+        this.collidersHelices.push(he4.h2);
+        this.add(he4);
+
+
 
     }
 
@@ -409,6 +487,14 @@ class MyScene extends Physijs.Scene {
         pincho1.position.set(300, 10, 10);
         this.colliderPinchos.push(pincho1.sphere);
         this.add(pincho1);
+
+
+        var pincho2 = pincho1.clone();
+        pincho2.position.copy(pincho1.position);
+        pincho2.position.x += 120;
+        pincho2.position.z -= 20;
+        this.colliderPinchos.push(pincho2.sphere);
+        this.add(pincho2);
     }
 
     posicionarGemas() {
@@ -480,6 +566,14 @@ class MyScene extends Physijs.Scene {
         this.add(aro);
         this.collidersAros.push(aro.transparentBox);
         this.aros.push(aro);
+
+        var aro1 = aro.clone();
+        aro1.position.copy(aro.position);
+        aro.position.x += 250;
+        aro.position.z -= 5;
+        this.add(aro1);
+        this.collidersAros.push(aro1.transparentBox);
+        this.aros.push(aro);
     }
 
     posicionarMartillos() {
@@ -487,6 +581,8 @@ class MyScene extends Physijs.Scene {
         this.martillos.push(martillo);
 
         this.add(martillo);
+        
+  
 
         var martillo = new Martillo();
         this.martillos.push(martillo);
@@ -553,6 +649,7 @@ class MyScene extends Physijs.Scene {
         var skyBox = new THREE.Mesh(geometry, materials);
         skyBox.position.x = 1900;
         this.add(skyBox);
+        this.colliderSkyBox.push(skyBox);
     }
 
 
@@ -773,6 +870,7 @@ class MyScene extends Physijs.Scene {
         if (MyScene.INICIO && tecla == MyScene.SALTAR) {
             MyScene.INICIO = 0;
             document.getElementById('inicio').style = 'display: none';
+            document.getElementById('audio').play(); 
         }
 
         if (MyScene.MUERTO && tecla == MyScene.SALTAR) {

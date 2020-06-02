@@ -6,8 +6,7 @@ class Martillo extends THREE.Object3D {
         this.createHandle();
         this.createTweens();
 
-
-
+     
     }
 
     createHead() {
@@ -20,7 +19,7 @@ class Martillo extends THREE.Object3D {
         mesh.addEventListener('collision',
             function(o, v, r, n) {
 
-                MyScene.MUERTO = 1;
+                console.log("GGGG");
             }
 
         );
