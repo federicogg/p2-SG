@@ -13,7 +13,7 @@ class MyScene extends Physijs.Scene {
         MyScene.MUERTO = 0;
         MyScene.REINICIABONUS = 0;
         MyScene.CHECKPOINT = 0;
-        MyScene.VUELVECHECK =67;
+        MyScene.VUELVECHECK = 67;
 
         // El gestor de hebras
         Physijs.scripts.worker = './physijs/physijs_worker.js'
@@ -31,11 +31,11 @@ class MyScene extends Physijs.Scene {
         this.gui = this.createGUI();
 
 
-        this.axis = new THREE.AxesHelper(7);
-        this.add(this.axis);
+        // this.axis = new THREE.AxesHelper(7);
+        // this.add(this.axis);
 
         //this.createPlayer(1390,70,0); //Check point
-        this.createPlayer(-70,2,0);
+        this.createPlayer(-70, 2, 0);
 
         this.createGround(0);
 
@@ -176,9 +176,30 @@ class MyScene extends Physijs.Scene {
         var light = new THREE.PointLight(0xff8b00, 0.5, 100);
         light.position.set(1400, 70, 0);
         this.add(light);
+
+        var light = new THREE.PointLight(0x00ff9b, 0.5, 100);
+        light.position.set(1475, 40, -45);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x00ff9b, 0.5, 100);
+        light.position.set(1465, 40, 20);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x1b0080, 0.5, 100);
+        light.position.set(1690, 10, 0);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x1b0080, 0.5, 100);
+        light.position.set(1720, 15, 0);
+        this.add(light);
+
+        var light = new THREE.PointLight(0x1b0080, 0.5, 100);
+        light.position.set(1800, 30, 0);
+        this.add(light);
+
     }
 
-    createPlayer(x,y,z) {
+    createPlayer(x, y, z) {
 
         var materialPlayer = new THREE.MeshPhongMaterial({ color: 0xff0000 });
 
@@ -190,7 +211,7 @@ class MyScene extends Physijs.Scene {
         this.physicBox.position.y = y;
         this.physicBox.position.x = x;
         this.physicBox.position.z = z;
-     // this.physicBox.position.set(posicion);
+        // this.physicBox.position.set(posicion);
 
         var fuerza = 3;
         var offset = new THREE.Vector3(20, 0, 0);
@@ -212,7 +233,7 @@ class MyScene extends Physijs.Scene {
         document.getElementById('panel').innerHTML = "<h2>Score: " + this.puntos + "</h2>";
     }
 
-    createEscalera(width, num, index) {
+    createEscalera(width, num, index, z) {
 
         var texture = new THREE.TextureLoader().load('../imgs/escalera.png');
         var materialGround = new THREE.MeshPhongMaterial({ map: texture });
@@ -224,8 +245,10 @@ class MyScene extends Physijs.Scene {
             var platform = new Physijs.BoxMesh(geometry, materialFis, 0);
             platform.position.y += (i + 0.2) * 10;
             platform.position.x += (i * width) + 70 * index;
+            platform.position.z = z;
+
             platform.addEventListener('collision',
-                function (o, v, r, n) {
+                function(o, v, r, n) {
 
                     MyScene.SUELO = 1;
                 }
@@ -235,9 +258,6 @@ class MyScene extends Physijs.Scene {
         }
 
     }
-
-
-
 
 
     compruebaColision() {
@@ -259,7 +279,7 @@ class MyScene extends Physijs.Scene {
                 MyScene.CHECKPOINT = 1;
                 this.checkpoint.copy(this.physicBox.position);
                 console.log("HOLA");
-                console.log( MyScene.CHECKPOINT);
+                console.log(MyScene.CHECKPOINT);
             }
 
             if (colliderObjetivos.length > 0 && colliderObjetivos[0].distance < directionVector.length()) {
@@ -351,7 +371,7 @@ class MyScene extends Physijs.Scene {
                 }
 
 
-            }else{
+            } else {
 
             }
 
@@ -383,35 +403,35 @@ class MyScene extends Physijs.Scene {
     }
 
     reiniciaJuego() {
-        if(! MyScene.CHECKPOINT){
+        if (!MyScene.CHECKPOINT) {
             var fin = document.getElementById('fin');
             var score = document.getElementById('panel');
-    
+
             var d = document.createElement('h2');
             d.innerText = "GAME OVER";
             fin.appendChild(d);
-    
+
             var c = document.createElement('h2');
             c.innerText = score.innerText;
             d.appendChild(c);
-    
+
             var e = document.createElement('h2');
             e.innerText = "Pulsa Espacio para reiniciar el juego";
             c.appendChild(e);
-    
+
             this.remove(this.physicBox);
-        }else{
+        } else {
             var fin = document.getElementById('fin');
             var score = document.getElementById('panel');
-    
+
             var d = document.createElement('h2');
             d.innerText = "GAME OVER";
             fin.appendChild(d);
-    
+
             var c = document.createElement('h2');
             c.innerText = score.innerText;
             d.appendChild(c);
-    
+
             var e = document.createElement('h2');
             e.innerText = "Pulsa Espacio para reiniciar el juego";
             c.appendChild(e);
@@ -421,7 +441,7 @@ class MyScene extends Physijs.Scene {
             e.appendChild(f);
             this.remove(this.physicBox);
         }
-   
+
 
     }
 
@@ -431,11 +451,11 @@ class MyScene extends Physijs.Scene {
         if (!MyScene.MUERTO) {
             requestAnimationFrame(() => this.update());
         }
-       
+
 
         if (MyScene.MUERTO) {
             this.reiniciaJuego();
-            
+
         } else {
             if (!MyScene.INICIO) {
                 this.physicBox.applyCentralImpulse(this.effect);
@@ -476,6 +496,7 @@ class MyScene extends Physijs.Scene {
 
 
     }
+
     posicionarCheckPoint() {
         var geometry = new THREE.BoxGeometry(1, 8, 8);
         var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
@@ -601,6 +622,13 @@ class MyScene extends Physijs.Scene {
 
         //Check point
 
+        var he5 = new helices();
+        he5.position.set(1610, 35, -9);
+        this.helices.push(he5);
+        this.collidersHelices.push(he5.h1);
+        this.collidersHelices.push(he5.h2);
+        this.add(he5);
+
 
     }
 
@@ -644,7 +672,7 @@ class MyScene extends Physijs.Scene {
         var pincho4 = pincho3.clone();
         pincho4.position.z += 30;
         this.colliderPinchos.push(pincho4.sphere);
-       this.add(pincho4);
+        this.add(pincho4);
 
         pincho4 = new Pinchos(24);
         pincho4.position.copy(pincho3.position);
@@ -657,6 +685,20 @@ class MyScene extends Physijs.Scene {
         this.add(pincho4);
 
         //Check point
+        var pincho5 = new Pinchos(28);
+        pincho5.position.set(1440, 20, 15);
+        pincho5.rotation.y = 1.58;
+        pincho5.scale.set(0.5, 0.5, 0.5);
+        this.colliderPinchos.push(pincho5.sphere);
+        this.add(pincho5);
+
+        var pincho5 = new Pinchos(28);
+        pincho5.position.set(1440, 20, -35);
+        pincho5.rotation.y = 1.58;
+        pincho5.scale.set(0.5, 0.5, 0.5);
+        this.colliderPinchos.push(pincho5.sphere);
+        this.add(pincho5);
+
     }
 
     posicionarGemas() {
@@ -680,6 +722,12 @@ class MyScene extends Physijs.Scene {
         this.collidersGemas.push(gema.transparentBox);
 
         //Check point
+
+        var gema = new Gema(false);
+        gema.position.set(1555, 25, -5);
+        this.add(gema);
+        this.gemas.push(gema);
+        this.collidersGemas.push(gema.transparentBox);
 
     }
 
@@ -723,34 +771,91 @@ class MyScene extends Physijs.Scene {
         this.add(p6);
 
 
+
         p1.addEventListener('collision',
-            function (o, v, r, n) {
+            function(o, v, r, n) {
                 MyScene.SUELO = 1;
             }
 
         );
         p2.addEventListener('collision',
-            function (o, v, r, n) {
+            function(o, v, r, n) {
                 MyScene.SUELO = 1;
             }
 
         );
 
         p3.addEventListener('collision',
-            function (o, v, r, n) {
+            function(o, v, r, n) {
                 MyScene.SUELO = 1;
             }
 
         );
 
         p4.addEventListener('collision',
-            function (o, v, r, n) {
+            function(o, v, r, n) {
                 MyScene.SUELO = 1;
             }
 
         );
 
+        p5.addEventListener('collision',
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
+
+        );
+
+        p6.addEventListener('collision',
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
+
+        );
+
+
         //Check point
+        var p7 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+        p7.scale.x = 2.5;
+        p7.scale.z = 0.75;
+        p7.position.set(1475, 15, -45);
+        this.add(p7);
+
+        var p8 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+        p8.scale.x = 2.5;
+        p8.scale.z = 0.75;
+        p8.position.set(1475, 15, 5);
+        this.add(p8);
+
+        var p9 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+        p9.scale.x = 2.5;
+        p9.scale.z = 0.75;
+        p9.position.copy(p8.position);
+        p9.position.x += 105;
+        p9.position.z -= 20;
+        this.add(p9);
+
+        p7.addEventListener('collision',
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
+
+        );
+
+        p8.addEventListener('collision',
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
+
+        );
+
+        p9.addEventListener('collision',
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
+
+        );
+
     }
 
     posicionarAros() {
@@ -788,7 +893,14 @@ class MyScene extends Physijs.Scene {
         this.collidersAros.push(aro1.transparentBox);
         this.aros.push(aro);
 
+
         //Check point
+
+        aro1 = aro.clone();
+        aro1.position.set(1475, 28, 10);
+        this.add(aro1);
+        this.collidersAros.push(aro1.transparentBox);
+        this.aros.push(aro);
     }
 
 
@@ -800,14 +912,6 @@ class MyScene extends Physijs.Scene {
         meshMartillo.position.x -= 50;
         this.add(meshMartillo);
 
-        martillo = new Martillo();
-
-        var meshMartillo = martillo.getMesh();
-        this.martillos.push(meshMartillo);
-        meshMartillo.position.x = 850;
-        meshMartillo.position.y = 50;
-        //this.add(meshMartillo);
-
 
         martillo = new Martillo();
         var meshMartillo = martillo.getMesh();
@@ -817,12 +921,20 @@ class MyScene extends Physijs.Scene {
         meshMartillo.position.y += 10;
         this.add(meshMartillo);
 
-        for (let i = 0; i < this.martillos.length; i++) {
-            this.createTweensMartillo(i);
-        }
 
         //Check point
 
+        martillo = new Martillo();
+        var meshMartillo = martillo.getMesh();
+        this.martillos.push(meshMartillo);
+        meshMartillo.position.x = 1750;
+        meshMartillo.position.z = -30;
+        meshMartillo.position.y += 30;
+        this.add(meshMartillo);
+
+        for (let i = 0; i < this.martillos.length; i++) {
+            this.createTweensMartillo(i);
+        }
     }
 
     createTweensMartillo(i) {
@@ -836,7 +948,7 @@ class MyScene extends Physijs.Scene {
         var that = this.martillos[i];
 
 
-        movimiento.onUpdate(function () {
+        movimiento.onUpdate(function() {
             that.rotation.z = origen.x;
             that.__dirtyRotation = true;
 
@@ -848,7 +960,7 @@ class MyScene extends Physijs.Scene {
         var movimiento2 = new TWEEN.Tween(origen2).to(destino2, loop2);
         movimiento2.easing(TWEEN.Easing.Quadratic.InOut);
 
-        movimiento2.onUpdate(function () {
+        movimiento2.onUpdate(function() {
             that.rotation.z = origen2.x;
             that.__dirtyRotation = true;
         });
@@ -877,12 +989,11 @@ class MyScene extends Physijs.Scene {
         this.posicionarObjetivos();
         this.posicionarMartillos();
         this.posicionarsuelos();
-        this.createEscalera(40, 4, 0.3);
-        this.createEscalera(40, 4, 10.2);
-        this.createEscalera(40, 5, 17.8);
+        this.createEscalera(40, 4, 0.3, 0);
+        this.createEscalera(40, 4, 10.2, 0);
+        this.createEscalera(40, 5, 17.8, 0);
         this.posicionarCheckPoint();
-
-
+        this.createEscalera(40, 5, 23.69, -35);
     }
 
     createGround(offset) {
@@ -898,7 +1009,7 @@ class MyScene extends Physijs.Scene {
         ground.position.y = -25;
         ground.position.x = offset;
         ground.addEventListener('collision',
-            function (o, v, r, n) {
+            function(o, v, r, n) {
                 // Si el objeto que colisiona con el suelo es colisionable, se le quita el modo alambre
                 MyScene.SUELO = 1;
                 console.log(MyScene.SUELO);
@@ -983,9 +1094,9 @@ class MyScene extends Physijs.Scene {
         var gui = new dat.GUI();
 
 
-        this.guiControls = new function () {
+        this.guiControls = new function() {
             this.design = false;
-            this.x = 0.0;
+            this.x = 1785.0;
             this.y = 92.0;
             this.z = 200.0;
         }
@@ -1071,7 +1182,7 @@ class MyScene extends Physijs.Scene {
                     this.physicBox.__dirtyPosition = true;
                     break;
                 case MyScene.IZQUIERDA:
-                    var fuerza = 50;
+                    var fuerza = 80;
                     var offset = new THREE.Vector3(1, 0, 0);
                     var effect = offset.normalize().multiplyScalar(fuerza);
                     this.physicBox.applyCentralImpulse(effect.negate());
@@ -1090,7 +1201,7 @@ class MyScene extends Physijs.Scene {
                     //this.camera.lookAt(this.physicBox.position);
                     MyScene.MUERTO = 0;
                     MyScene.INICIO = 1;
-                    document.getElementById('fin').innerHTML="";
+                    document.getElementById('fin').innerHTML = "";
                     requestAnimationFrame(() => this.update());
             }
         }
@@ -1102,6 +1213,7 @@ class MyScene extends Physijs.Scene {
         var tecla = event.which || event.KeyCode;
 
         if (tecla == MyScene.SALTAR && MyScene.SUELO && !MyScene.INICIO) {
+            document.getElementById('jumpAudio').play();
             this.saltando = true;
             MyScene.SUELO = 0;
             var fuerza = 1300;
@@ -1116,7 +1228,7 @@ class MyScene extends Physijs.Scene {
             MyScene.INICIO = 0;
             document.getElementById('inicio').style = 'display: none';
             document.getElementById('manual').style = 'display:none';
-            //document.getElementById('audio').play();
+            document.getElementById('startAudio').play();
         }
 
         if (MyScene.MUERTO && tecla == MyScene.SALTAR) {
@@ -1145,7 +1257,7 @@ class MyScene extends Physijs.Scene {
 }
 
 /// La función   main
-$(function () {
+$(function() {
 
     // Se instancia la escena pasándole el  div  que se ha creado en el html para visualizar
     var scene = new MyScene("#WebGL-output");
