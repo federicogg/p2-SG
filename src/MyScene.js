@@ -519,7 +519,7 @@ class MyScene extends Physijs.Scene {
 
     posicionarCheckPoint() {
         var geometry = new THREE.BoxGeometry(1, 8, 8);
-        var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        var material = new THREE.MeshPhongMaterial({ visible: false });
 
         var c = new THREE.Mesh(geometry, material);
         c.scale.set(1, 6, 7);
@@ -532,7 +532,7 @@ class MyScene extends Physijs.Scene {
     posicionarObjetivos() {
 
         var geometry = new THREE.BoxGeometry(1, 8, 8);
-        var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        var material = new THREE.MeshPhongMaterial({ visible: false });
 
         this.ob1 = new THREE.Mesh(geometry, material);
         this.colliderObjetivos.push(this.ob1);
