@@ -40,8 +40,11 @@ class MyScene extends Physijs.Scene {
         this.createGround(0);
 
 
-        this.salida = new Salida();
-        this.add(this.salida);
+        var salida = new Salida();
+        this.add(salida);
+        var meta = new Salida();
+        meta.position.x = 2350;
+        this.add(meta);
         this.checkpoint = new THREE.Vector3(0, 0, 0);
 
 
@@ -64,14 +67,21 @@ class MyScene extends Physijs.Scene {
         this.aros = [];
         this.martillos = [];
 
+        this.helices2 = [];
+        this.gemas2 = [];
+        this.aros2 = [];
+
         this.createObstaculos();
 
+        this.luces = new Luces();
+        this.add(this.luces);
         this.createLights();
-        this.createPointLights();
+      
         this.createSkyBox();
 
         //Contador
         this.contador = 0;
+        this.checkscore = 0;
 
         //Booleanos;
         this.hayObjetivos = true;
@@ -91,113 +101,7 @@ class MyScene extends Physijs.Scene {
     }
 
 
-    createPointLights() {
-        var light = new THREE.PointLight(0xff0000, 0.5, 100);
-        light.position.set(-40, 10, -15);
-        this.add(light);
 
-        var light = new THREE.PointLight(0xff0000, 0.5, 100);
-        light.position.set(-40, 10, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff0000, 0.5, 100);
-        light.position.set(40, 10, -15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff0000, 0.5, 100);
-        light.position.set(40, 10, 15);
-        this.add(light);
-
-
-        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
-        light.position.set(430, 10, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
-        light.position.set(430, 10, -15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
-        light.position.set(270, 10, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x0027ff, 0.5, 100);
-        light.position.set(270, 10, -15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
-        light.position.set(520, 10, -15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
-        light.position.set(520, 10, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
-        light.position.set(670, 10, -15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xf7ff00, 0.5, 100);
-        light.position.set(670, 10, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(910, 60, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(910, 60, -15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(1030, 10, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(1060, 10, 15);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(1160, 10, 25);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(1260, 10, 0);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(1360, 30, 0);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(1360, 30, 0);
-        this.add(light);
-
-        var light = new THREE.PointLight(0xff8b00, 0.5, 100);
-        light.position.set(1400, 70, 0);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x00ff9b, 0.5, 100);
-        light.position.set(1475, 40, -45);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x00ff9b, 0.5, 100);
-        light.position.set(1465, 40, 20);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x1b0080, 0.5, 100);
-        light.position.set(1690, 10, 0);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x1b0080, 0.5, 100);
-        light.position.set(1720, 15, 0);
-        this.add(light);
-
-        var light = new THREE.PointLight(0x1b0080, 0.5, 100);
-        light.position.set(1800, 30, 0);
-        this.add(light);
-
-    }
 
     createPlayer(x, y, z) {
 
@@ -278,8 +182,7 @@ class MyScene extends Physijs.Scene {
             if (colliderCheckPoint.length > 0 && colliderCheckPoint[0].distance < directionVector.length()) {
                 MyScene.CHECKPOINT = 1;
                 this.checkpoint.copy(this.physicBox.position);
-                console.log("HOLA");
-                console.log(MyScene.CHECKPOINT);
+                
             }
 
             if (colliderObjetivos.length > 0 && colliderObjetivos[0].distance < directionVector.length()) {
@@ -372,6 +275,70 @@ class MyScene extends Physijs.Scene {
 
 
             } else {
+
+                var collidersGemas2 = ray.intersectObjects(this.collidersGemas2);
+                var collidersAros2 = ray.intersectObjects(this.collidersAros2);
+                var collidersHelices2 = ray.intersectObjects(this.collidersHelices2);
+                var colliderPinchos2 = ray.intersectObjects(this.colliderPinchos2);
+
+                if (collidersGemas2.length > 0 && collidersGemas2[0].distance < directionVector.length()) {
+                    console.log('GEMA');
+                    var index = this.collidersGemas2.indexOf(collidersGemas2[0].object);
+                    if (index != -1) {
+                        this.collidersGemas2.splice(index, 1);
+                        this.remove(this.gemas2[index]);
+                        this.gemas2.splice(index, 1);
+
+                    }
+                    if (MyScene.ENBONUS) {
+                        MyScene.REINICIABONUS = 1;
+
+                    }
+                    MyScene.ENBONUS = 1;
+
+                }
+
+
+
+                if (collidersAros2.length > 0 && collidersAros2[0].distance < directionVector.length()) {
+                    console.log('ARO');
+                    this.incrementaPuntos(30);
+                    var index = this.collidersAros2.indexOf(collidersAros2[0].object);
+                    if (index != -1) {
+                        //Borramos el aro de la lista de colliders y de la escena
+                        this.collidersAros2.splice(index, 1);
+                        this.remove(this.aros2[index]);
+                        this.aros2.splice(index, 1);
+                        document.getElementById('audioAro').play();
+                    }
+
+                }
+                if (collidersHelices2.length > 0 && collidersHelices2[0].distance < directionVector.length() && !MyScene.ENBONUS) {
+                    console.log('Helices');
+                    if (this.hayHelices) {
+                        MyScene.MUERTO = 1;
+                        this.hayHelices = false;
+
+                    }
+
+
+
+                } else {
+                    this.hayHelices = true;
+                }
+
+                if (colliderPinchos2.length > 0 && colliderPinchos2 [0].distance < directionVector.length() && !MyScene.ENBONUS) {
+                    console.log('Pinchos');
+                    if (this.hayPinchos) {
+                        this.hayPinchos = false;
+                        MyScene.MUERTO = 1;
+                    }
+
+                } else {
+
+                    this.hayPinchos = true;
+                }
+
 
             }
 
@@ -472,13 +439,25 @@ class MyScene extends Physijs.Scene {
             this.incrementarTiempo();
         }
 
-        for (var i = 0; i < this.helices.length; i++) {
-            this.helices[i].update();
-        }
+        if(!MyScene.CHECKPOINT){
+            for (var i = 0; i < this.helices.length; i++) {
+                this.helices[i].update();
+            }
+    
+            for (var i = 0; i < this.gemas.length; i++) {
+                this.gemas[i].update();
+            }
 
-        for (var i = 0; i < this.gemas.length; i++) {
-            this.gemas[i].update();
+        }else{
+            for (var i = 0; i < this.helices2.length; i++) {
+                this.helices2[i].update();
+            }
+    
+            for (var i = 0; i < this.gemas2.length; i++) {
+                this.gemas2[i].update();
+            }
         }
+       
 
         this.barraupdate();
         this.cameraUpdate();
@@ -502,7 +481,7 @@ class MyScene extends Physijs.Scene {
         var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
 
         var c = new THREE.Mesh(geometry, material);
-        c.scale.set(1, 6, 5);
+        c.scale.set(1, 6, 7);
         c.position.set(1400, 70, 0);
         this.colliderCheckPoint.push(c);
         this.add(c);
@@ -570,6 +549,13 @@ class MyScene extends Physijs.Scene {
 
         //Check point
 
+        var o = ob7.clone();
+   
+        o.position.set(1420, 70, 0);
+        
+        this.colliderObjetivos.push(o);
+        this.add(o);
+
 
     }
 
@@ -624,9 +610,9 @@ class MyScene extends Physijs.Scene {
 
         var he5 = new helices();
         he5.position.set(1610, 35, -9);
-        this.helices.push(he5);
-        this.collidersHelices.push(he5.h1);
-        this.collidersHelices.push(he5.h2);
+        this.helices2.push(he5);
+        this.collidersHelices2.push(he5.h1);
+        this.collidersHelices2.push(he5.h2);
         this.add(he5);
 
 
@@ -689,14 +675,16 @@ class MyScene extends Physijs.Scene {
         pincho5.position.set(1440, 20, 15);
         pincho5.rotation.y = 1.58;
         pincho5.scale.set(0.5, 0.5, 0.5);
-        this.colliderPinchos.push(pincho5.sphere);
+        pincho5.sphere.scale.set(0.5,1,0.5);
+        this.colliderPinchos2.push(pincho5.sphere);
         this.add(pincho5);
 
         var pincho5 = new Pinchos(28);
         pincho5.position.set(1440, 20, -35);
         pincho5.rotation.y = 1.58;
         pincho5.scale.set(0.5, 0.5, 0.5);
-        this.colliderPinchos.push(pincho5.sphere);
+        pincho5.sphere.scale.set(0.5,1,0.5);
+        this.colliderPinchos2.push(pincho5.sphere);
         this.add(pincho5);
 
     }
@@ -726,8 +714,8 @@ class MyScene extends Physijs.Scene {
         var gema = new Gema(false);
         gema.position.set(1555, 25, -5);
         this.add(gema);
-        this.gemas.push(gema);
-        this.collidersGemas.push(gema.transparentBox);
+        this.gemas2.push(gema);
+        this.collidersGemas2.push(gema.transparentBox);
 
     }
 
@@ -835,6 +823,23 @@ class MyScene extends Physijs.Scene {
         p9.position.z -= 20;
         this.add(p9);
 
+        var p10 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+   
+        p10.position.copy(p9.position);
+        p10.scale.x =  2.5;
+        p10.position.x += 330;
+
+        p10.position.y += 40;
+        this.add(p10);
+
+        var p11 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
+        p11.scale.x =  2.5;
+        p11.position.copy(p10.position);
+        p11.position.x += 110;
+
+       
+        this.add(p11);
+
         p7.addEventListener('collision',
             function(o, v, r, n) {
                 MyScene.SUELO = 1;
@@ -855,6 +860,20 @@ class MyScene extends Physijs.Scene {
             }
 
         );
+
+        p10.addEventListener('collision',
+        function(o, v, r, n) {
+            MyScene.SUELO = 1;
+        }
+
+         );
+
+         p11.addEventListener('collision',
+         function(o, v, r, n) {
+             MyScene.SUELO = 1;
+         }
+ 
+          );
 
     }
 
@@ -899,8 +918,8 @@ class MyScene extends Physijs.Scene {
         aro1 = aro.clone();
         aro1.position.set(1475, 28, 10);
         this.add(aro1);
-        this.collidersAros.push(aro1.transparentBox);
-        this.aros.push(aro);
+        this.collidersAros2.push(aro1.transparentBox);
+        this.aros2.push(aro);
     }
 
 
@@ -973,11 +992,19 @@ class MyScene extends Physijs.Scene {
         movimiento2.start();
     }
 
+    posicionarEscalera(){
+        this.createEscalera(40, 4, 0.3, 0);
+        this.createEscalera(40, 4, 10.2, 0);
+        this.createEscalera(40, 5, 17.8, 0);
+        this.createEscalera(40, 5, 23.69, -35);
+    }
 
     posicionarsuelos() {
         this.createGround(350);
         this.createGround(590);
         this.createGround(1040);
+        this.createGround(2200);
+
         //Check point
     }
     createObstaculos() {
@@ -989,11 +1016,9 @@ class MyScene extends Physijs.Scene {
         this.posicionarObjetivos();
         this.posicionarMartillos();
         this.posicionarsuelos();
-        this.createEscalera(40, 4, 0.3, 0);
-        this.createEscalera(40, 4, 10.2, 0);
-        this.createEscalera(40, 5, 17.8, 0);
+        this.posicionarEscalera();
         this.posicionarCheckPoint();
-        this.createEscalera(40, 5, 23.69, -35);
+      
     }
 
     createGround(offset) {
@@ -1123,7 +1148,7 @@ class MyScene extends Physijs.Scene {
 
     createLights() {
 
-        var ambientLight = new THREE.AmbientLight(0x404040, 0.01);
+        var ambientLight = new THREE.AmbientLight(0x404040, 0.4);
         // La añadimos a la escena
         this.add(ambientLight);
 
@@ -1201,6 +1226,8 @@ class MyScene extends Physijs.Scene {
                     //this.camera.lookAt(this.physicBox.position);
                     MyScene.MUERTO = 0;
                     MyScene.INICIO = 1;
+                
+                    console.log(this.checkscore);
                     document.getElementById('fin').innerHTML = "";
                     requestAnimationFrame(() => this.update());
             }
