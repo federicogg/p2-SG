@@ -11,6 +11,7 @@ class MyScene extends Physijs.Scene {
         MyScene.ENBONUS = 0;
         MyScene.INICIO = 1;
         MyScene.MUERTO = 0;
+        MyScene.TERMINADO = 0;
         MyScene.REINICIABONUS = 0;
         MyScene.CHECKPOINT = 0;
         MyScene.VUELVECHECK = 67;
@@ -34,17 +35,21 @@ class MyScene extends Physijs.Scene {
         // this.axis = new THREE.AxesHelper(7);
         // this.add(this.axis);
 
-        //this.createPlayer(1390,70,0); //Check point
         this.createPlayer(-70, 2, 0);
+        //this.createPlayer(1390, 70, 0); //Check point
+        //this.createPlayer(2220, 70, -2); //Meta
 
-        this.createGround(0);
+
 
 
         var salida = new Salida();
         this.add(salida);
-        var meta = new Salida();
+        var meta = new Meta();
         meta.position.x = 2350;
+        meta.position.z = -10;
         this.add(meta);
+        this.colliderMeta = [];
+        this.colliderMeta.push(meta.collider);
         this.checkpoint = new THREE.Vector3(0, 0, 0);
 
 
@@ -76,7 +81,7 @@ class MyScene extends Physijs.Scene {
         this.luces = new Luces();
         this.add(this.luces);
         this.createLights();
-      
+
         this.createSkyBox();
 
         //Contador
@@ -118,6 +123,7 @@ class MyScene extends Physijs.Scene {
         // this.physicBox.position.set(posicion);
 
         var fuerza = 3;
+        this.aceleracion = 0;
         var offset = new THREE.Vector3(20, 0, 0);
         this.effect = offset.normalize().multiplyScalar(fuerza);
         this.physicBox.setLinearVelocity(offset);
@@ -178,11 +184,12 @@ class MyScene extends Physijs.Scene {
             var colliderSkyBox = ray.intersectObjects(this.colliderSkyBox);
             var colliderCheckPoint = ray.intersectObjects(this.colliderCheckPoint);
             var colliderObjetivos = ray.intersectObjects(this.colliderObjetivos);
+            var colliderMeta = ray.intersectObjects(this.colliderMeta);
 
             if (colliderCheckPoint.length > 0 && colliderCheckPoint[0].distance < directionVector.length()) {
                 MyScene.CHECKPOINT = 1;
                 this.checkpoint.copy(this.physicBox.position);
-                
+
             }
 
             if (colliderObjetivos.length > 0 && colliderObjetivos[0].distance < directionVector.length()) {
@@ -209,11 +216,19 @@ class MyScene extends Physijs.Scene {
 
             }
 
+
+            if (colliderMeta.length > 0 && colliderMeta[0].distance < directionVector.length() && !MyScene.TERMINADO) {
+                console.log('META');
+                MyScene.TERMINADO = 1;
+            }
+
             if (!MyScene.CHECKPOINT) {
                 var collidersGemas = ray.intersectObjects(this.collidersGemas);
                 var collidersAros = ray.intersectObjects(this.collidersAros);
                 var collidersHelices = ray.intersectObjects(this.collidersHelices);
                 var colliderPinchos = ray.intersectObjects(this.colliderPinchos);
+                var colliderMeta = ray.intersectObjects(this.colliderMeta);
+
 
                 if (collidersGemas.length > 0 && collidersGemas[0].distance < directionVector.length()) {
                     console.log('GEMA');
@@ -222,7 +237,6 @@ class MyScene extends Physijs.Scene {
                         this.collidersGemas.splice(index, 1);
                         this.remove(this.gemas[index]);
                         this.gemas.splice(index, 1);
-
                     }
                     if (MyScene.ENBONUS) {
                         MyScene.REINICIABONUS = 1;
@@ -231,6 +245,7 @@ class MyScene extends Physijs.Scene {
                     MyScene.ENBONUS = 1;
 
                 }
+
 
 
 
@@ -327,7 +342,7 @@ class MyScene extends Physijs.Scene {
                     this.hayHelices = true;
                 }
 
-                if (colliderPinchos2.length > 0 && colliderPinchos2 [0].distance < directionVector.length() && !MyScene.ENBONUS) {
+                if (colliderPinchos2.length > 0 && colliderPinchos2[0].distance < directionVector.length() && !MyScene.ENBONUS) {
                     console.log('Pinchos');
                     if (this.hayPinchos) {
                         this.hayPinchos = false;
@@ -340,11 +355,11 @@ class MyScene extends Physijs.Scene {
                 }
 
 
+
             }
 
-
-
         }
+
 
 
     }
@@ -369,8 +384,8 @@ class MyScene extends Physijs.Scene {
 
     }
 
-    reiniciaJuego() {
-        if (!MyScene.CHECKPOINT) {
+    reiniciaJuego(terminado) {
+        if (!MyScene.CHECKPOINT && !terminado) {
             var fin = document.getElementById('fin');
             var score = document.getElementById('panel');
 
@@ -386,8 +401,8 @@ class MyScene extends Physijs.Scene {
             e.innerText = "Pulsa Espacio para reiniciar el juego";
             c.appendChild(e);
 
-            this.remove(this.physicBox);
-        } else {
+
+        } else if (!terminado) {
             var fin = document.getElementById('fin');
             var score = document.getElementById('panel');
 
@@ -406,8 +421,31 @@ class MyScene extends Physijs.Scene {
             var f = document.createElement('h2');
             f.innerText = "Pulsa C para volver al punto de control"
             e.appendChild(f);
-            this.remove(this.physicBox);
+
+        } else {
+            var fin = document.getElementById('fin');
+            var score = document.getElementById('panel');
+
+            var d = document.createElement('h2');
+            d.innerText = "¡EHNORABUENA HAS TERMINADO!";
+            fin.appendChild(d);
+
+            var c = document.createElement('h2');
+            c.innerText = score.innerText;
+            d.appendChild(c);
+
+            var e = document.createElement('h2');
+            e.innerText = "Pulsa espacio para reiniciar el juego";
+            c.appendChild(e);
+
         }
+
+        this.remove(this.physicBox);
+
+
+    }
+
+    terminarJuego() {
 
 
     }
@@ -415,19 +453,16 @@ class MyScene extends Physijs.Scene {
 
     update() {
 
-        if (!MyScene.MUERTO) {
+        if (!MyScene.MUERTO && !MyScene.TERMINADO) {
             requestAnimationFrame(() => this.update());
         }
 
-
-        if (MyScene.MUERTO) {
-            this.reiniciaJuego();
+        if (MyScene.MUERTO || MyScene.TERMINADO) {
+            this.reiniciaJuego(MyScene.TERMINADO);
 
         } else {
-            if (!MyScene.INICIO) {
+            if (!MyScene.INICIO)
                 this.physicBox.applyCentralImpulse(this.effect);
-
-            }
         }
 
 
@@ -439,25 +474,25 @@ class MyScene extends Physijs.Scene {
             this.incrementarTiempo();
         }
 
-        if(!MyScene.CHECKPOINT){
+        if (!MyScene.CHECKPOINT) {
             for (var i = 0; i < this.helices.length; i++) {
                 this.helices[i].update();
             }
-    
+
             for (var i = 0; i < this.gemas.length; i++) {
                 this.gemas[i].update();
             }
 
-        }else{
+        } else {
             for (var i = 0; i < this.helices2.length; i++) {
                 this.helices2[i].update();
             }
-    
+
             for (var i = 0; i < this.gemas2.length; i++) {
                 this.gemas2[i].update();
             }
         }
-       
+
 
         this.barraupdate();
         this.cameraUpdate();
@@ -472,6 +507,12 @@ class MyScene extends Physijs.Scene {
     }
 
     barraupdate() {
+        var barra = document.getElementById('barra');
+        var positionPlayer = this.physicBox.position.x + 70;
+
+        var width = positionPlayer / 23.53;
+        width = width + "%";
+        barra.style.width = width;
 
 
     }
@@ -550,9 +591,9 @@ class MyScene extends Physijs.Scene {
         //Check point
 
         var o = ob7.clone();
-   
+
         o.position.set(1420, 70, 0);
-        
+
         this.colliderObjetivos.push(o);
         this.add(o);
 
@@ -675,7 +716,7 @@ class MyScene extends Physijs.Scene {
         pincho5.position.set(1440, 20, 15);
         pincho5.rotation.y = 1.58;
         pincho5.scale.set(0.5, 0.5, 0.5);
-        pincho5.sphere.scale.set(0.5,1,0.5);
+        pincho5.sphere.scale.set(0.5, 1, 0.5);
         this.colliderPinchos2.push(pincho5.sphere);
         this.add(pincho5);
 
@@ -683,7 +724,7 @@ class MyScene extends Physijs.Scene {
         pincho5.position.set(1440, 20, -35);
         pincho5.rotation.y = 1.58;
         pincho5.scale.set(0.5, 0.5, 0.5);
-        pincho5.sphere.scale.set(0.5,1,0.5);
+        pincho5.sphere.scale.set(0.5, 1, 0.5);
         this.colliderPinchos2.push(pincho5.sphere);
         this.add(pincho5);
 
@@ -824,20 +865,20 @@ class MyScene extends Physijs.Scene {
         this.add(p9);
 
         var p10 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
-   
+
         p10.position.copy(p9.position);
-        p10.scale.x =  2.5;
+        p10.scale.x = 2.5;
         p10.position.x += 330;
 
         p10.position.y += 40;
         this.add(p10);
 
         var p11 = new Physijs.BoxMesh(geometryGround, materialFis, 0);
-        p11.scale.x =  2.5;
+        p11.scale.x = 2.5;
         p11.position.copy(p10.position);
         p11.position.x += 110;
 
-       
+
         this.add(p11);
 
         p7.addEventListener('collision',
@@ -862,18 +903,18 @@ class MyScene extends Physijs.Scene {
         );
 
         p10.addEventListener('collision',
-        function(o, v, r, n) {
-            MyScene.SUELO = 1;
-        }
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
 
-         );
+        );
 
-         p11.addEventListener('collision',
-         function(o, v, r, n) {
-             MyScene.SUELO = 1;
-         }
- 
-          );
+        p11.addEventListener('collision',
+            function(o, v, r, n) {
+                MyScene.SUELO = 1;
+            }
+
+        );
 
     }
 
@@ -947,8 +988,8 @@ class MyScene extends Physijs.Scene {
         var meshMartillo = martillo.getMesh();
         this.martillos.push(meshMartillo);
         meshMartillo.position.x = 1750;
-        meshMartillo.position.z = -30;
-        meshMartillo.position.y += 30;
+        meshMartillo.position.z = -18;
+        meshMartillo.position.y += 25;
         this.add(meshMartillo);
 
         for (let i = 0; i < this.martillos.length; i++) {
@@ -992,18 +1033,19 @@ class MyScene extends Physijs.Scene {
         movimiento2.start();
     }
 
-    posicionarEscalera(){
+    posicionarEscalera() {
         this.createEscalera(40, 4, 0.3, 0);
         this.createEscalera(40, 4, 10.2, 0);
         this.createEscalera(40, 5, 17.8, 0);
-        this.createEscalera(40, 5, 23.69, -35);
+        this.createEscalera(40, 5, 23.69, -20);
     }
 
     posicionarsuelos() {
-        this.createGround(350);
-        this.createGround(590);
-        this.createGround(1040);
-        this.createGround(2200);
+        this.createGround(0, 0);
+        this.createGround(350, 0);
+        this.createGround(590, 0);
+        this.createGround(1040, 0);
+        this.createGround(2200, -10);
 
         //Check point
     }
@@ -1018,10 +1060,10 @@ class MyScene extends Physijs.Scene {
         this.posicionarsuelos();
         this.posicionarEscalera();
         this.posicionarCheckPoint();
-      
+
     }
 
-    createGround(offset) {
+    createGround(offset, z) {
 
         var geometryGround = new THREE.BoxGeometry(200, 50, 50);
 
@@ -1033,11 +1075,11 @@ class MyScene extends Physijs.Scene {
         var ground = new Physijs.BoxMesh(geometryGround, materialFis, 0);
         ground.position.y = -25;
         ground.position.x = offset;
+        ground.position.z = z;
         ground.addEventListener('collision',
             function(o, v, r, n) {
                 // Si el objeto que colisiona con el suelo es colisionable, se le quita el modo alambre
                 MyScene.SUELO = 1;
-                console.log(MyScene.SUELO);
 
             }
         );
@@ -1121,7 +1163,7 @@ class MyScene extends Physijs.Scene {
 
         this.guiControls = new function() {
             this.design = false;
-            this.x = 1785.0;
+            this.x = 2228.0;
             this.y = 92.0;
             this.z = 200.0;
         }
@@ -1184,7 +1226,6 @@ class MyScene extends Physijs.Scene {
 
     eventosTeclado(event) {
         var tecla = event.which || event.KeyCode;
-        console.log(tecla);
         if (!MyScene.INICIO) {
 
 
@@ -1226,7 +1267,7 @@ class MyScene extends Physijs.Scene {
                     //this.camera.lookAt(this.physicBox.position);
                     MyScene.MUERTO = 0;
                     MyScene.INICIO = 1;
-                
+
                     console.log(this.checkscore);
                     document.getElementById('fin').innerHTML = "";
                     requestAnimationFrame(() => this.update());
@@ -1258,7 +1299,7 @@ class MyScene extends Physijs.Scene {
             document.getElementById('startAudio').play();
         }
 
-        if (MyScene.MUERTO && tecla == MyScene.SALTAR) {
+        if ((MyScene.MUERTO || MyScene.TERMINADO) && tecla == MyScene.SALTAR) {
             location.reload();
         }
 
