@@ -58,7 +58,7 @@
         <div style="position: absolute; left: 450px; top:200px ;color: aliceblue;" id="inicio">
             <h2> Pulsa Espacio para empezar a jugar</h2>
         </div>
-        <div style="position: absolute; left: 450px; top:100px ;color: aliceblue;" id="fin">
+        <div style="position: absolute; left: 200px; top:50px ;text-align:center;color: aliceblue;" id="fin">
 
         </div>
         <div style="position: absolute; left: 100px; top:10px ;color: aliceblue;" id="panel">
@@ -66,6 +66,9 @@
         </div>
         <div style="position: absolute; left: 100px; top:30px ;color: aliceblue;" id="bonus">
             <h2> Inmunidad: OFF</h2>
+        </div>
+        <div style="position: absolute; left: 100px; top:55px ;color: aliceblue;" id="check">
+            <h2> Checkpoint: OFF</h2>
         </div>
 
         <audio id="audio" style="display: none;" controls>
@@ -91,13 +94,16 @@
             <source type="audio/wav"
                 src="../songs/jump.wav">
         </audio>
-
+        <audio id="checkAudio" style="display: none;" controls>
+            <source type="audio/wav"
+                src="../songs/checkpoint-sound-effect.mp3">
+        </audio>
 
         <div id="progreso">
             <div id="barra"></div>
         </div>
 
-        <div style="position: absolute; left: 300px; top:500px; color: aliceblue;" id="manual">
+        <div style="position: absolute; left: 470px; top:400px; color: aliceblue;" id="manual">
             <span style="font-size:50px;"> &#8592;</span>
             <span style="font-size:10px; position: relative; right: 55px; top: 10px;"> RETROCEDER</span>
 
